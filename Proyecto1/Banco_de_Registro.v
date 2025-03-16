@@ -35,12 +35,61 @@ module register_bank_8088(
     reg[15:0] CS, DS, PS, ES;
 
     always @(posedge clk or posedge reset) begin
-    if (reset) begin
-        // Inicializar todos los registros
-        AX <= 16'h0000; BX <= 16'h0000; CX <= 16'h0000; DX <= 16'h0000; SP <= 16'h0000; 
-        BP <= 16'h0000; SI <= 16'h0000; DI <= 16'h0000; IP <= 16'h0000; FLAGS <= 16'h0000; 
-        CS <= 16'h0000; DS <= 16'h0000; PS <= 16'h0000; ES <= 16'h0000;
+        if (reset) begin
+            // Inicializar todos los registros
+            AX <= 16'h0000; BX <= 16'h0000; CX <= 16'h0000; DX <= 16'h0000; SP <= 16'h0000; 
+            BP <= 16'h0000; SI <= 16'h0000; DI <= 16'h0000; IP <= 16'h0000; FLAGS <= 16'h0000; 
+            CS <= 16'h0000; DS <= 16'h0000; PS <= 16'h0000; ES <= 16'h0000;
         end
+        else if (en_write) begin
+            if (size == 1) // Escribir en los registros de 16 bits
+                case (reg_write)
+                    4'h0: AX <= write_data;
+                    4'h1: BX <= write_data;
+                    4'h2: CX <= write_data;
+                    4'h3: DX <= write_data;
+                    4'h4: SP <= write_data;
+                    4'h5: BP <= write_data;
+                    4'h6: SI <= write_data;
+                    4'h7: DI <= write_data;
+                    4'h8: IP <= write_data;
+                    4'h9: FLAGS <= write_data;
+                    4'hA: CS <= write_data;
+                    4'hB: DS <= write_data;
+                    4'hC: PS <= write_data;
+                    4'hD: ES <= write_data;
+                    default;
+                    
+                endcase
+        end
+            else begin
+                case (reg_write) // Si se escribe en un registro de 8 bits, seleccionar parte alta o baja de los registros de uso general
+                    4'h0: begin
+                        if (select_high_low == 0)
+                            AX[7:0] <= write_data[7:0];
+                        else
+                            AX[15:8] <= write_data[7:0];
+                    end
+                    4'h1: begin
+                        if (select_high_low == 0)
+                            BX[7:0] <= write_data[7:0];
+                        else
+                            BX[15:8] <= write_data[7:0];
+                    end
+                    4'h2: begin
+                        if (select_high_low == 0)
+                            CX[7:0] <= write_data[7:0];
+                        else
+                            CX[15:8] <= write_data[7:0];
+                    end
+                    4'h3: begin
+                        if (select_high_low == 0)
+                            DX[7:0] <= write_data[7:0];
+                        else
+                            DX[15:8] <= write_data[7:0];
+                    end
+                endcase
+            end
     end
 
 endmodule
