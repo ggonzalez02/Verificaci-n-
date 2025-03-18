@@ -59,7 +59,7 @@ module register_bank_8088(
                     4'hC: PS <= write_data;
                     4'hD: ES <= write_data;
                     default;
-                    
+            
                 endcase
         end
             else begin
@@ -90,6 +90,46 @@ module register_bank_8088(
                     end
                 endcase
             end
+    end
+
+    always(*) begin 
+        case(reg_read1) //Lectura de Registro 1
+            4'h0: AX = read_data1;
+            4'h1: BX = read_data1;
+            4'h2: CX = read_data1;
+            4'h3: DX = read_data1;
+            4'h4: SP = read_data1;
+            4'h5: BP = read_data1;
+            4'h6: SI = read_data1;
+            4'h7: DI = read_data1;
+            4'h8: IP = read_data1;
+            4'h9: FLAGS = read_data1;
+            4'hA: CS = read_data1;
+            4'hB: DS = read_data1;
+            4'hC: PS = read_data1;
+            4'hD: ES = read_data1;
+            default read_data1 = 16'h0000;
+
+        endcase
+
+        case(reg_read2) //Lectura de Registro 2
+            4'h0: AX = read_data2;
+            4'h1: BX = read_data2;
+            4'h2: CX = read_data2;
+            4'h3: DX = read_data2;
+            4'h4: SP = read_data2;
+            4'h5: BP = read_data2;
+            4'h6: SI = read_data2;
+            4'h7: DI = read_data2;
+            4'h8: IP = read_data2;
+            4'h9: FLAGS = read_data2;
+            4'hA: CS = read_data2;
+            4'hB: DS = read_data2;
+            4'hC: PS = read_data2;
+            4'hD: ES = read_data2;
+            default read_data2 = 16'h0000;
+
+        endcase
     end
 
 endmodule
