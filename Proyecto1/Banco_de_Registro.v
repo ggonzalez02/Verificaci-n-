@@ -12,10 +12,10 @@ module register_bank_8088(
     input clk
     input reset
     input wire en_write,           // 1: Habilita escritura, 0: Escritura inhabilitada
-    input wire [3:0] reg_write,    // Registro a escribir
+    input wire [2:0] reg_write,    // Registro a escribir
     input wire [15:0] write_data,  // Datos a escribir
-    input wire [3:0] reg_read1,    // Primer registro de lectura
-    input wire [3:0] reg_read2,    // Segundo registro de lectura
+    input wire [2:0] reg_read1,    // Primer registro de lectura
+    input wire [2:0] reg_read2,    // Segundo registro de lectura
     input wire size,               // Tamaño del registro (0: 8 bits, 1: 16 bits)
     input wire select_high_low,    // Selección de XH o XL (0: parte baja, 1: parte alta )
     output wire [15:0] read_data1, // Datos leídos del primer registro
@@ -26,20 +26,13 @@ module register_bank_8088(
     reg[15:0] AX, BX, CX, DX;
 
     // Registros Punteros y de Índice
-    reg[15:0] SP, BP, SI, DI, IP;
-
-    // Registro de Banderas
-    reg[15:0] FLAGS;
-
-    // Registros de Segmento
-    reg[15:0] CS, DS, PS, ES;
+    reg[15:0] SP, BP, SI, DI;
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             // Inicializar todos los registros
-            AX <= 16'h0000; BX <= 16'h0000; CX <= 16'h0000; DX <= 16'h0000; SP <= 16'h0000; 
-            BP <= 16'h0000; SI <= 16'h0000; DI <= 16'h0000; IP <= 16'h0000; FLAGS <= 16'h0000; 
-            CS <= 16'h0000; DS <= 16'h0000; PS <= 16'h0000; ES <= 16'h0000;
+            AX <= 16'h0000; BX <= 16'h0000; CX <= 16'h0000; DX <= 16'h0000; 
+            SP <= 16'h0000; BP <= 16'h0000; SI <= 16'h0000; DI <= 16'h0000;
         end
         else if (en_write) begin
             if (size == 1) // Escribir en los registros de 16 bits
@@ -52,14 +45,7 @@ module register_bank_8088(
                     4'h5: BP <= write_data;
                     4'h6: SI <= write_data;
                     4'h7: DI <= write_data;
-                    4'h8: IP <= write_data;
-                    4'h9: FLAGS <= write_data;
-                    4'hA: CS <= write_data;
-                    4'hB: DS <= write_data;
-                    4'hC: PS <= write_data;
-                    4'hD: ES <= write_data;
                     default;
-            
                 endcase
         end
             else begin
@@ -102,12 +88,6 @@ module register_bank_8088(
             4'h5: BP = read_data1;
             4'h6: SI = read_data1;
             4'h7: DI = read_data1;
-            4'h8: IP = read_data1;
-            4'h9: FLAGS = read_data1;
-            4'hA: CS = read_data1;
-            4'hB: DS = read_data1;
-            4'hC: PS = read_data1;
-            4'hD: ES = read_data1;
             default read_data1 = 16'h0000;
 
         endcase
@@ -121,14 +101,7 @@ module register_bank_8088(
             4'h5: BP = read_data2;
             4'h6: SI = read_data2;
             4'h7: DI = read_data2;
-            4'h8: IP = read_data2;
-            4'h9: FLAGS = read_data2;
-            4'hA: CS = read_data2;
-            4'hB: DS = read_data2;
-            4'hC: PS = read_data2;
-            4'hD: ES = read_data2;
             default read_data2 = 16'h0000;
-
         endcase
     end
 
