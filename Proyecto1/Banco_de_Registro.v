@@ -76,10 +76,10 @@ module register_bank_8088(
                     end
                 endcase
             end
-    end
+        end
     end
 
-    always(*) begin 
+    always@(*) begin
         case(reg_read1) //Lectura de Registro 1
             3'h0: read_data1 = AX;
             3'h1: read_data1 = BX;
