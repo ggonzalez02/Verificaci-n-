@@ -5,7 +5,7 @@
 //              Gabriel González                                                
 //  
 // Module Name: register_bank_8088_tb_2
-// Description: Testbench que muestra el cambio en las señales del banco de registros del microprocesador 8088
+// Description: Tester, ScoreBoard y Cover Groups
 //////////////////////////////////////////////////////////////////////////////////
 
 `timescale 1ns / 1ps
