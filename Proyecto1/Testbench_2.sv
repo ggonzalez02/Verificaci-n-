@@ -178,4 +178,38 @@ module register_bank_8088_tb_2;
 
     end: scoreboard
 
+//COVER GROUPS
+
+/* bins
+        -> lectura
+        -> escritura 
+        -> lectura -> lectura
+        -> lectura -> escritura
+        -> escritura -> escritura
+        -> escritura -> lectura
+        -> reset -> lectura
+        -> reset -> escritura
+        -> Acceso a Registros (Que los 8 registros se accedan para lectura y escritura)
+        -> Escritura 16 bits
+        -> Escritura 8 bits
+        -> Escritura en la parte alta
+        -> Escritura en la parte baja
+        -> Patrones de Datos
+*/
+
+    covergroup op_cover;
+        coverpoint en_write {
+            bins op[] = {[read : write]};
+            bins escritura = {write};
+            bins lectura = {read};
+            bins write_read[] = {write => read};
+            bins write_write[] = {write => write};
+            bins read_read[] = {read => read};
+            bins read_write[] = {read => write};
+            bins reset_read[] = {reset => read};
+            bins reset_write[] = {reset => write};
+        }
+    endgroup
+
+
 endmodule
