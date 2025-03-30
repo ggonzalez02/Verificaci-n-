@@ -42,11 +42,19 @@ module register_bank_8088_tb;
     
     // Generación del reloj
     initial begin
+            
         clk = 0;
         forever #5 clk = ~clk; 
     end
     
+    integer log_file;
+    
     initial begin
+    
+        // Abrir archivo tipo log
+        log_file = $fopen("register_bank_8088.log", "w");
+        $fdisplay(log_file, "Time | reset | en_write | reg_write | write_data | size | high_low | read1 | read2");
+        
         // Inicialización de señales
         reset = 1;
         en_write = 0;
@@ -138,6 +146,8 @@ module register_bank_8088_tb;
         
         // Terminar la simulación
         #10;
+        //Cerrar archivo tipo log
+        $fclose(log_file);
         $finish;
     end
     
@@ -145,6 +155,11 @@ module register_bank_8088_tb;
     initial begin
         $monitor("Time: %3dns | reset: %b | en_write: %b | reg_write: %h | write_data: %h | size: %b | high_low: %b | read1: %h | read2: %h",
                  $time, reset, en_write, reg_write, write_data, size, select_high_low, read_data1, read_data2);
+        forever begin
+            #10;
+            $fdisplay(log_file, "%3dns | %b | %b | %h | %h | %b | %b | %h | %h", 
+                      $time, reset, en_write, reg_write, write_data, size, select_high_low, read_data1, read_data2);
+        end
     end
 
 endmodule
