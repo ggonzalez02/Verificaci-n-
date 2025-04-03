@@ -4,37 +4,40 @@
 //              Maricruz Campos                                                 
 //              Gabriel González                                                
 //  
-// Module Name: Banco_de_Registros_tb
+// Module Name: register_bank_8088_tb
 // Description: Testbench que muestra el cambio en las señales del banco de registros del microprocesador 8088
 //////////////////////////////////////////////////////////////////////////////////
 
 `timescale 1ns / 1ps
 
-module Banco_de_Registros_tb;
+module register_bank_8088_tb;
 
     // Señales de entrada y salida del DUT
-    reg clk,
-    reg reset,
-    reg [2:0] select_reg,
-    reg size,
-    reg select_high_low,
-    reg select_data_h_reg,
-    reg read_write,
-    wire [15:0] data_pin;   // Señal direccional para el DUT
-    reg [15:0] data_drive;  // Señal local
-
-    assign data_pin = data_drive;
+    reg clk;
+    reg reset;
+    reg en_write;
+    reg [2:0] reg_write;
+    reg [15:0] write_data;
+    reg [2:0] reg_read1;
+    reg [2:0] reg_read2;
+    reg size;
+    reg select_high_low;
+    wire [15:0] read_data1;
+    wire [15:0] read_data2;
     
     // Instancia del módulo
-    Banco_de_Registros dut (
+    register_bank_8088 dut (
         .clk(clk),
         .reset(reset),
-        .select_reg(select_reg),
+        .en_write(en_write),
+        .reg_write(reg_write),
+        .write_data(write_data),
+        .reg_read1(reg_read1),
+        .reg_read2(reg_read2),
         .size(size),
         .select_high_low(select_high_low),
-        .select_data_h_reg(select_data_h_reg),
-        .read_write(read_write),
-        .data(data_pin)
+        .read_data1(read_data1),
+        .read_data2(read_data2)
     );
     
     // Generación del reloj
@@ -49,17 +52,18 @@ module Banco_de_Registros_tb;
     initial begin
     
         // Abrir archivo tipo log
-        log_file = $fopen("Banco_de_Registros_tb.log", "w");
-        $fdisplay(log_file, "Time | reset | select_reg | size | select_high_low | select_data_h_reg | read_write | data");
+        log_file = $fopen("register_bank_8088.log", "w");
+        $fdisplay(log_file, "Time | reset | en_write | reg_write | write_data | size | high_low | read1 | read2");
         
         // Inicialización de señales
         reset = 1;
-        select_reg = 3'h0;
+        en_write = 0;
+        reg_write = 3'h0;
+        write_data = 16'h0000;
+        reg_read1 = 3'h0;
+        reg_read2 = 3'h0;
         size = 1;
         select_high_low = 0;
-        select_data_h_reg = 0;
-        read_write = 0;
-        data_drive 16'h0000;
         
         // Desactivar reset
         #20;
@@ -67,84 +71,78 @@ module Banco_de_Registros_tb;
         #10;
         
         // Prueba 1: Escribir en AX
-        read_write = 1;
-        select_reg = 3'h0;
-        data_drive = 16'hABCD;
+        en_write = 1;
+        reg_write = 3'h0; 
+        write_data = 16'hABCD;
         size = 1; // 16 bits
         #10;
         
         // Leer AX
-        read_write = 0;
-        select_reg = 3'h0; 
+        en_write = 0;
+        reg_read1 = 3'h0; 
         #10;
         
         // Prueba 2: Escribir en BL
-        read_write = 1;
-        select_reg = 3'h1; 
-        data_drive = 16'h00EF; 
+        en_write = 1;
+        reg_write = 3'h1; 
+        write_data = 16'h00EF; 
         size = 0; // 8 bits
         select_high_low = 0; // Parte baja
         #10;
         
         // Prueba 3: Escribir en BH
-        data_drive = 16'h0012; 
+        write_data = 16'h0012; 
         select_high_low = 1; // Parte alta
         #10;
         
         // Leer BX
-        read_write = 0;
-        select_reg = 3'h1; 
+        en_write = 0;
+        reg_read1 = 3'h1; 
         #10;
         
         // Prueba 4: Escribir en CX y DX 
-        read_write = 1;
-        select_reg = 3'h2; 
-        data_drive = 16'h3456;
+        en_write = 1;
+        reg_write = 3'h2; 
+        write_data = 16'h3456;
         size = 1; 
         #10;
         
-        select_reg = 3'h3; 
-        data_drive = 16'h789A;
+        reg_write = 3'h3; 
+        write_data = 16'h789A;
         #10;
         
         // Leer CX y DX 
-        read_write = 0;
-        select_reg = 3'h2; // CX
-        #10;
-
-        reg_read2 = 3'h3; // DX
+        en_write = 0;
+        reg_read1 = 3'h2; 
+        reg_read2 = 3'h3; 
         #10;
         
         // Prueba 5: Escribir en registros de puntero e índice
-        read_write = 1;
-        select_reg = 3'h4; // SP
-        data_drive = 16'hFFFC;
+        en_write = 1;
+        reg_write = 3'h4; // SP
+        write_data = 16'hFFFC;
         #10;
         
-        select_reg = 3'h5; // BP
-        data_drive = 16'hAABB;
+        reg_write = 3'h5; // BP
+        write_data = 16'hAABB;
         #10;
         
-        select_reg = 3'h6; // SI
-        data_drive = 16'hCCDD;
+        reg_write = 3'h6; // SI
+        write_data = 16'hCCDD;
         #10;
         
-        select_reg = 3'h7; // DI
-        data_drive = 16'hEEFF;
+        reg_write = 3'h7; // DI
+        write_data = 16'hEEFF;
         #10;
         
         // Leer 
-        read_write = 0;
-        select_reg = 3'h4;
+        en_write = 0;
+        reg_read1 = 3'h4; 
+        reg_read2 = 3'h7; 
         #10;
 
-        select_reg = 3'h7; 
-        #10;
-
-        select_reg = 3'h5;
-        #10;
-         
-        select_reg = 3'h6; 
+        reg_read1 = 3'h5; 
+        reg_read2 = 3'h6; 
         
         // Terminar la simulación
         #10;
@@ -155,13 +153,12 @@ module Banco_de_Registros_tb;
     
     // Monitoreo de señales
     initial begin
-        "Time | reset | select_reg | size | select_high_low | select_data_h_reg | read_write | data"
-        $monitor("Time: %3dns | reset: %b | select_reg: %b | size: %h | select_high_low: %h | select_data_h_reg: %b | read_write: %b | data: %h",
-                 $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
+        $monitor("Time: %3dns | reset: %b | en_write: %b | reg_write: %h | write_data: %h | size: %b | high_low: %b | read1: %h | read2: %h",
+                 $time, reset, en_write, reg_write, write_data, size, select_high_low, read_data1, read_data2);
         forever begin
             #10;
             $fdisplay(log_file, "%3dns | %b | %b | %h | %h | %b | %b | %h | %h", 
-                      $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
+                      $time, reset, en_write, reg_write, write_data, size, select_high_low, read_data1, read_data2);
         end
     end
 
