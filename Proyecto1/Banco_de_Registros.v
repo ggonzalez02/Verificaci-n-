@@ -9,22 +9,23 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module Banco_de_Registros (
-    input clk,
-    input reset,
-    input [2:0] select_reg,
-    input size,
-    input select_high_low,
-    input select_data_h_reg,
-    input read_write,
-    inout [15:0] data
+    input clk,              // Reloj
+    input reset,            // Señal de reinicio
+    input [2:0] select_reg, // Entrada de selección
+    input size,             // Tamaño del dato (1: 16 bits, 0: 8 bits)
+    input select_high_low,  // Seleccionar parte alta (1) o baja (0) de los registros de uso general
+    input select_data_h_reg, // Selección de la parte baja (0) o alta (1) de data_in en los registros tipo H
+    input read_write,       // Señal que habilita la escritura o lectura del registro
+    inout [15:0] data       // Datos que se escriben o se leen de los registros (lectura: salida, escritura: entrada)
 );
   
-    wire [15:0] enable_write;      // Señal del decodificador al banco de registros
-    wire [15:0] reg_data_out;      // Datos de salida de los registros
-    wire [15:0] data_in;           // Datos para escribir en los registros
+    // Variables internas
+    wire [15:0] enable_write;    // Señal del decodificador al banco de registros
+    wire [15:0] reg_data_out;    // Datos de salida de los registros (lectura)
+    wire [15:0] data_in;         // Datos para escribir en los registros
 
-    wire [7:0] AL, BL, CL, DL, AH, BH, CH, DH;
-    wire [15:0] AX, BX, CX, DX, SI, DI, SP, BP;
+    wire [7:0] AL, BL, CL, DL, AH, BH, CH, DH; // Registros de 8 bits
+    wire [15:0] AX, BX, CX, DX, SI, DI, SP, BP; // Registros de 16 bits
     
     // Instancia del decodificador
     Decoder decoder (
@@ -35,8 +36,8 @@ module Banco_de_Registros (
     );
 
     // Buffer tristate para controlar la dirección de los datos
-    assign data = (!read_write) ? reg_data_out : 16'bZ; // Si read_write=0, se activa la función de lectura
-    assign data_in = data;                                  // Se conecta el bus a la entrada de datos
+    assign data = (!read_write) ? reg_data_out : 16'bZ;   // Si read_write = 0, se activa la función de lectura, si es 1 se activa la escritura
+    assign data_in = data;                                // Se conecta el bus a la entrada/salida de datos
     
     // Instancia del banco de registros
     Registros registers (
