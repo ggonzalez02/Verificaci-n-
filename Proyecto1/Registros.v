@@ -11,17 +11,18 @@
 module Registros (
     input clk,
     input reset,
-    input [15:0] en_write,  // Señal que habilita el registro
-    input [15:0] data_in,   // Datos de entrada
+    input [15:0] en_write,   // Señal que habilita el registro
+    input [15:0] data_in,    // Datos de entrada
     input select_data_h_reg, // Selección de la parte baja (0) o alta (1) de data_in en los registros tipo H
-    output wire [7:0] AL, BL, CL, DL, AH, BH, CH, DH,
-    output wire [15:0] AX, BX, CX, DX, SI, DI, SP, BP
+    output wire [7:0] AL, BL, CL, DL, AH, BH, CH, DH, // Registros de 8 bits
+    output wire [15:0] AX, BX, CX, DX, SI, DI, SP, BP // Registros de 16 bits
 );
 
     // Registros internos para el manejo de datos
     reg [15:0] AX_reg, BX_reg, CX_reg, DX_reg, SP_reg, BP_reg, SI_reg, DI_reg;
 
     // Asignación de salidas usando los registros internos
+    // Registros de 8 bits
     assign AL = AX_reg[7:0];    
     assign BL = BX_reg[7:0];    
     assign CL = CX_reg[7:0];    
@@ -31,6 +32,7 @@ module Registros (
     assign CH = CX_reg[15:8];   
     assign DH = DX_reg[15:8];   
     
+    // Registros de 16 bits
     assign AX = AX_reg;
     assign BX = BX_reg;
     assign CX = CX_reg;
@@ -41,17 +43,20 @@ module Registros (
     assign DI = DI_reg;
 
     always @(posedge clk or posedge reset) begin
-        if (reset == 1) begin
+        // Reset activado: Todos los registros se inicializan en 0
+        if (reset == 1) begin           
             AX_reg <= 16'h0000; BX_reg <= 16'h0000; CX_reg <= 16'h0000; DX_reg <= 16'h0000; 
             SP_reg <= 16'h0000; BP_reg <= 16'h0000; SI_reg <= 16'h0000; DI_reg <= 16'h0000;
         end
-        else begin
+        // Se analiza cual bit está activo para identificar el registro correspondiente
+        // Registros de Uso General
+        else begin  
             if (en_write[0])
                 AX_reg <= data_in;
             else if (en_write[12])
                 AX_reg[7:0] <= data_in[7:0];
             else if (en_write[8]) begin
-                if (select_data_h_reg == 1)
+                if (select_data_h_reg == 1) // Si es un registro H (AH, BH, CH o DH) se elige cuál parte de los datos de entrada se quiere escribir
                     AX_reg[15:8] <= data_in[15:8];
                 else 
                     AX_reg[15:8] <= data_in[7:0];
@@ -90,6 +95,7 @@ module Registros (
                     DX_reg[15:8] <= data_in[7:0];
             end 
 
+            // Registros de Puntero e Indice
             if (en_write[4])
                 SI_reg <= data_in;
 
@@ -103,6 +109,5 @@ module Registros (
                 BP_reg <= data_in;            
         end
     end
-
 
 endmodule

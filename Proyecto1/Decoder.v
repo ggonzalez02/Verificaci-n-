@@ -9,10 +9,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module Decoder (
-    input [2:0] select_reg,    // Variable que elige el registro
-    input size,                // Tamaño del dato (1= 16 bits, 0= 8 bits)
-    input select_high_low,     // Seleccionar parte alta (1) o baja (0) de los registros de uso general
-    output reg [15:0] output_reg    // Salida
+    input [2:0] select_reg,        // Entrada de selección del registro
+    input size,                    // Tamaño del dato (1= 16 bits, 0= 8 bits)
+    input select_high_low,         // Seleccionar parte alta (1) o baja (0) de los registros de uso general
+    output reg [15:0] output_reg   // Salida
 );
 
     always @(*) begin
