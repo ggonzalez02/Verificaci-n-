@@ -13,13 +13,13 @@
 module Banco_de_Registros_tb;
 
     // Señales de entrada y salida del DUT
-    reg clk,
-    reg reset,
-    reg [2:0] select_reg,
-    reg size,
-    reg select_high_low,
-    reg select_data_h_reg,
-    reg read_write,
+    reg clk;
+    reg reset;
+    reg [2:0] select_reg;
+    reg size;
+    reg select_high_low;
+    reg select_data_h_reg;
+    reg read_write;
     wire [15:0] data_pin;   // Señal direccional para el DUT
     reg [15:0] data_drive;  // Señal local
 
@@ -39,12 +39,11 @@ module Banco_de_Registros_tb;
     
     // Generación del reloj
     initial begin
-            
         clk = 0;
         forever #5 clk = ~clk; 
     end
     
-    integer log_file;
+    integer log_file; // Declaración del archivo log
     
     initial begin
     
@@ -59,7 +58,7 @@ module Banco_de_Registros_tb;
         select_high_low = 0;
         select_data_h_reg = 0;
         read_write = 0;
-        data_drive 16'h0000;
+        data_drive = 16'h0000;
         
         // Desactivar reset
         #20;
@@ -89,61 +88,67 @@ module Banco_de_Registros_tb;
         // Prueba 3: Escribir en BH
         data_drive = 16'h0012; 
         select_high_low = 1; // Parte alta
+        select_data_h_reg = 0; // Introducir los valores del 7:0 en la parte alta
         #10;
         
         // Leer BX
         read_write = 0;
-        select_reg = 3'h1; 
+        select_reg = 3'h1;
+        size = 1; // 16 bits
         #10;
         
-        // Prueba 4: Escribir en CX y DX 
+        // Prueba 4: Escribir en CX y DX
+        // CX
         read_write = 1;
         select_reg = 3'h2; 
         data_drive = 16'h3456;
         size = 1; 
         #10;
-        
+        // DX
         select_reg = 3'h3; 
         data_drive = 16'h789A;
         #10;
         
-        // Leer CX y DX 
+        // Leer CX y DX
+        // CX
         read_write = 0;
         select_reg = 3'h2; // CX
         #10;
-
-        reg_read2 = 3'h3; // DX
+        // DX
+        select_reg = 3'h3; // DX
         #10;
         
         // Prueba 5: Escribir en registros de puntero e índice
+        // SP
         read_write = 1;
         select_reg = 3'h4; // SP
         data_drive = 16'hFFFC;
         #10;
-        
+        // BP
         select_reg = 3'h5; // BP
         data_drive = 16'hAABB;
         #10;
-        
+        // SI
         select_reg = 3'h6; // SI
         data_drive = 16'hCCDD;
         #10;
-        
+        // DI
         select_reg = 3'h7; // DI
         data_drive = 16'hEEFF;
         #10;
         
         // Leer 
+        // SP
         read_write = 0;
         select_reg = 3'h4;
         #10;
-
+        // DI
         select_reg = 3'h7; 
         #10;
-
+        // BP
         select_reg = 3'h5;
         #10;
-         
+        // SI
         select_reg = 3'h6; 
         
         // Terminar la simulación
@@ -155,7 +160,6 @@ module Banco_de_Registros_tb;
     
     // Monitoreo de señales
     initial begin
-        "Time | reset | select_reg | size | select_high_low | select_data_h_reg | read_write | data"
         $monitor("Time: %3dns | reset: %b | select_reg: %b | size: %h | select_high_low: %h | select_data_h_reg: %b | read_write: %b | data: %h",
                  $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
         forever begin
