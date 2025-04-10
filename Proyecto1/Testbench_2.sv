@@ -12,15 +12,24 @@
 
 module Banco_de_Registros_tb_2;
 
+    //Enum's para debuguear más fácilmente
+    typedef enum reg { leer = 1'b0, escribir = 1'b1 } operacion; //Lectura o escritura para señal read_write
+    typedef enum reg { _8bits = 1'b0, _16bits = 1'b1 } tamano; //8 o 16 bits para señal size
+    typedef enum reg { parte_baja = 1'b0, parte_alta = 1'b1 } parte_alta_baja;
+    typedef enum reg { registro_bajo = 1'b0, registro_alto = 1'b1 } datos_registro_h;
+
     // Señales de entrada y salida del DUT
-    bit clk;
-    bit reset;
-    bit [2:0] select_reg;
-    bit size;
-    bit select_high_low;
-    bit select_data_h_reg;
-    bit read_write;
-    bit [15:0] data;
+    reg clk;
+    reg reset;
+    reg [2:0] select_reg;
+    tamano size;
+    parte_alta_baja select_high_low;
+    datos_registro_h select_data_h_reg;
+    operacion read_write;
+    wire [15:0] data_pin;   // Señal direccional para el DUT
+    reg [15:0] data_drive;  // Señal local
+
+    assign data_pin = data_drive;
     
     // Instancia del módulo
     Banco_de_Registros dut (
@@ -31,11 +40,13 @@ module Banco_de_Registros_tb_2;
         .select_high_low(select_high_low),
         .select_data_h_reg(select_data_h_reg),
         .read_write(read_write),
-        .data(data)
+        .data(data_pin)
     );
 
-    typedef enum bit { read = 1'b0, write = 1'b1 } operacion;
-    bit FIN; // Señal para el scoreboard
+    // Señales para el scoreboard
+    bit GUARDAR;
+    bit REVISAR;
+    reg [15:0] expected_data = 16'h0000;
 
 //TESTER
     // Generación del reloj
@@ -46,56 +57,55 @@ module Banco_de_Registros_tb_2;
 
     integer log_file; // Declaración del archivo log
 
-    // Función para definir operación
-    function operacion obtener_operacion();
-        bit tipo_op;
-        tipo_op = $random;
-        case(tipo_op)
-            1'b1: return write;
-            1'b0: return read; 
-        endcase
-    endfunction: obtener_operacion
-
     // Función para elegir el registro en el que se va a escribir o leer
-    function bit[2:0] obtener_registro();
-        bit[2:0] registro;
+    function reg[2:0] obtener_registro();
+        reg[2:0] registro;
         registro = $random;
         return registro;
     endfunction: obtener_registro
 
     // Función para elegir un registro que se encuentre en el rango de los disponibles de 8 bits
-    function bit[2:0] obtener_registro_bajo();
-        bit[2:0] registro;
-        registro = {$random} % 3;
-        return registro;
+    function reg[2:0] obtener_registro_bajo();
+        reg[2:0] reg_bajo;
+        reg_bajo = {$random} % 3;
+        return reg_bajo;
     endfunction: obtener_registro_bajo
 
     // Función para elegir el dato que se va escribir en el registro
-    function bit[15:0] obtener_dato();
-        bit[15:0] dato;
+    function reg[15:0] obtener_dato();
+        reg[15:0] dato;
         dato = $random;
         return dato;
     endfunction: obtener_dato
 
     // Función para elegir si escribir en un registro de 8 o 16 bits
-    function bit obtener_tamano();
-        bit tamano;
-        tamano = $random;
-        return tamano;
+    function tamano obtener_tamano();
+        reg tam;
+        tam = $random;
+        case(tam)
+            1'b0: return _8bits;
+            1'b1: return _16bits;
+        endcase
     endfunction: obtener_tamano
 
     //Función para elegir si escribir en la parte alta o baja del registro
-    function bit seleccionar_parte_alta_baja();
-        bit parte_alta_baja;
-        parte_alta_baja = $random;
-        return parte_alta_baja;
+    function parte_alta_baja seleccionar_parte_alta_baja();
+        reg alta_baja;
+        alta_baja = $random;
+        case(alta_baja)
+            1'b0: return parte_baja;
+            1'b1: return parte_alta;
+        endcase
     endfunction: seleccionar_parte_alta_baja
 
     //Función para seleccionar los datos que se van a escribir en la parte alta del registro
-    function bit seleccionar_datos_registro_h();
-        bit datos_registro_h;
-        datos_registro_h = $random;
-        return datos_registro_h;
+    function datos_registro_h seleccionar_datos_registro_h();
+        reg registro_h;
+        registro_h = $random;
+        case(registro_h)
+            1'b0: return registro_bajo;
+            1'b1: return registro_alto; 
+        endcase
     endfunction: seleccionar_datos_registro_h
 
     // Cuerpo de Test
@@ -107,11 +117,11 @@ module Banco_de_Registros_tb_2;
         // Inicialización de señales
         reset = 1;
         select_reg = 3'h0;
-        size = 1;
-        select_high_low = 0;
-        select_data_h_reg = 0;
-        read_write = 0;
-        data = 16'h0000;
+        size = _16bits;
+        select_high_low = parte_baja;
+        select_data_h_reg = registro_bajo;
+        read_write = leer;
+        data_drive = 16'h0000;
 
         // Desactivar reset
         #20;
@@ -121,71 +131,81 @@ module Banco_de_Registros_tb_2;
         // Testeo
         repeat(3) begin
             @(negedge clk);
-            read_write = obtener_operacion();
 
-            if (read_write == write) begin
-                data = obtener_dato();
-                size = obtener_tamano();
+            //Escribir en algún registro aleatorio
+            read_write = escribir;
+            data_drive = obtener_dato();
+            size = obtener_tamano();
 
-                if (size == 0) begin
-                    if (select_reg > 3) begin
-                        select_reg = obtener_registro_bajo();
-                    end
-                    else begin
-                        select_reg = obtener_registro();
-                        select_high_low = seleccionar_parte_alta_baja();
-                        select_data_h_reg = seleccionar_datos_registro_h();
-                    end
+            if (size == _8bits) begin
+                if (select_reg > 3) begin
+                    select_reg = obtener_registro_bajo();
+                end
+                else begin
+                    select_reg = obtener_registro();
                 end
             end
             else begin
                 select_reg = obtener_registro();
-
-                FIN = 1;
-                #1;
-                FIN = 0;
             end
+            select_high_low = seleccionar_parte_alta_baja();
+            select_data_h_reg = seleccionar_datos_registro_h();
+            
+            GUARDAR = 1;
+            #1;
+            GUARDAR = 0;
+            #20;
+
+            //Leer el registro en el que se escribió
+            read_write = leer;
+            select_reg = select_reg;
+            select_high_low = select_high_low;
+            select_data_h_reg = select_data_h_reg;
+            
+            REVISAR = 1;
+            #1;
+            REVISAR = 0;
+            #20;
         end
 
     end: tester
 
 //SCOREBOARD
 
-    always@(posedge FIN) begin: scoreboard
-        bit [15:0] expected_data;
-        expected_data = 16'h0000;
-
-        // Calcular el valor esperado
-        if (read_write == 1) begin
-            if (size == 1) begin // Escritura de 16 bits
-                expected_data = data;
+    always@(posedge GUARDAR) begin: scoreboard_guardar
+        
+        //Guardar el valor esperado
+        if (size == _16bits) begin // Escritura de 16 bits
+                expected_data = data_drive;
             end 
             else begin // Escritura de 8 bits
-                if (select_high_low == 0) begin
-                        expected_data[7:0] = data[7:0];
+                if (select_high_low == parte_baja) begin
+                        expected_data[7:0] = data_drive[7:0];
                     end
                     else begin 
-                        expected_data[15:8] = data[7:0];
+                        expected_data[15:8] = data_drive[7:0];
                     end
             end
-        end
-    
+
+    end: scoreboard_guardar
+
+    always@(posedge REVISAR) begin: scoreboard_revisar
+
         // Verificar lectura del registro
-        if (expected_data != data)
-            $error("FALLO: Reg1: %0h, Esperado: %0h, Obtenido: %0h", 
-                select_reg, expected_data, data);
+        if (expected_data != data_pin)
+            $error("FALLO: Reg: %0h, Esperado: %0h, Obtenido: %0h", 
+                select_reg, expected_data, data_pin);
 
-    end: scoreboard
-
+    end: scoreboard_revisar
 
 // Monitoreo de señales
     initial begin
-        $monitor("Time: %3dns | reset: %b | select_reg: %b | size: %h | select_high_low: %h | select_data_h_reg: %b | read_write: %b | data: %h",
+        $monitor("Time: %3dns | reset: %b | select_reg: %b | size: %b | select_high_low: %b | select_data_h_reg: %b | read_write: %b | data: %h",
                  $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
         forever begin
             #10;
-            $fdisplay(log_file, "%3dns | %b | %b | %h | %h | %b | %b | %h | %h", 
-                      $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
+            $fdisplay(log_file, "%3dns | %b | %b | %b | %b | %b | %b | %h", 
+                 $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
         end
     end
 

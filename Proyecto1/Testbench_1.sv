@@ -70,12 +70,12 @@ module Banco_de_Registros_tb;
         select_reg = 3'h0;
         data_drive = 16'hABCD;
         size = 1; // 16 bits
-        #10;
+        #20;
         
         // Leer AX
         read_write = 0;
         select_reg = 3'h0; 
-        #10;
+        #20;
         
         // Prueba 2: Escribir en BL
         read_write = 1;
@@ -83,19 +83,19 @@ module Banco_de_Registros_tb;
         data_drive = 16'h00EF; 
         size = 0; // 8 bits
         select_high_low = 0; // Parte baja
-        #10;
+        #20;
         
         // Prueba 3: Escribir en BH
         data_drive = 16'h0012; 
         select_high_low = 1; // Parte alta
         select_data_h_reg = 0; // Introducir los valores del 7:0 en la parte alta
-        #10;
+        #20;
         
         // Leer BX
         read_write = 0;
         select_reg = 3'h1;
         size = 1; // 16 bits
-        #10;
+        #20;
         
         // Prueba 4: Escribir en CX y DX
         // CX
@@ -103,56 +103,58 @@ module Banco_de_Registros_tb;
         select_reg = 3'h2; 
         data_drive = 16'h3456;
         size = 1; 
-        #10;
+        #20;
         // DX
+        read_write = 1;
         select_reg = 3'h3; 
         data_drive = 16'h789A;
-        #10;
+        #20;
         
         // Leer CX y DX
         // CX
         read_write = 0;
         select_reg = 3'h2; // CX
-        #10;
+        #20;
         // DX
+        read_write = 0;
         select_reg = 3'h3; // DX
-        #10;
+        #20;
         
         // Prueba 5: Escribir en registros de puntero e índice
         // SP
         read_write = 1;
         select_reg = 3'h4; // SP
         data_drive = 16'hFFFC;
-        #10;
+        #20;
         // BP
         select_reg = 3'h5; // BP
         data_drive = 16'hAABB;
-        #10;
+        #20;
         // SI
         select_reg = 3'h6; // SI
         data_drive = 16'hCCDD;
-        #10;
+        #20;
         // DI
         select_reg = 3'h7; // DI
         data_drive = 16'hEEFF;
-        #10;
+        #20;
         
         // Leer 
         // SP
         read_write = 0;
         select_reg = 3'h4;
-        #10;
+        #20;
         // DI
         select_reg = 3'h7; 
-        #10;
+        #20;
         // BP
         select_reg = 3'h5;
-        #10;
+        #20;
         // SI
         select_reg = 3'h6; 
         
         // Terminar la simulación
-        #10;
+        #20;
         //Cerrar archivo tipo log
         $fclose(log_file);
         $finish;
@@ -160,12 +162,12 @@ module Banco_de_Registros_tb;
     
     // Monitoreo de señales
     initial begin
-        $monitor("Time: %3dns | reset: %b | select_reg: %b | size: %h | select_high_low: %h | select_data_h_reg: %b | read_write: %b | data: %h",
+        $monitor("Time: %3dns | reset: %b | select_reg: %b | size: %b | select_high_low: %b | select_data_h_reg: %b | read_write: %b | data: %h",
                  $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
         forever begin
             #10;
-            $fdisplay(log_file, "%3dns | %b | %b | %h | %h | %b | %b | %h | %h", 
-                      $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
+            $fdisplay(log_file, "%3dns | %b | %b | %b | %b | %b | %b | %h", 
+                 $time, reset, select_reg, size, select_high_low, select_data_h_reg, read_write, data_pin);
         end
     end
 
