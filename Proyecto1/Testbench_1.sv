@@ -123,19 +123,19 @@ module Banco_de_Registros_tb;
         // Prueba 5: Escribir en registros de puntero e índice
         // SP
         read_write = 1;
-        select_reg = 3'h4; // SP
+        select_reg = 3'h4; // SI
         data_drive = 16'hFFFC;
         #20;
         // BP
-        select_reg = 3'h5; // BP
+        select_reg = 3'h5; // DI
         data_drive = 16'hAABB;
         #20;
         // SI
-        select_reg = 3'h6; // SI
+        select_reg = 3'h6; // SP
         data_drive = 16'hCCDD;
         #20;
         // DI
-        select_reg = 3'h7; // DI
+        select_reg = 3'h7; // BP
         data_drive = 16'hEEFF;
         #20;
         
