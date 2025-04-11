@@ -168,6 +168,12 @@ module Banco_de_Registros_tb_2;
             #20;
         end
 
+        // Terminar la simulación
+        #20;
+        //Cerrar archivo tipo log
+        $fclose(log_file);
+        $finish;
+
     end: tester
 
 //SCOREBOARD
