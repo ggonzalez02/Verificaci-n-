@@ -13,7 +13,7 @@ module top (
     input reset,
     input [2:0] OP,
     output [19:0] Direction,
-    output [7:0] Data;
+    output [7:0] Data
 );
     
 endmodule

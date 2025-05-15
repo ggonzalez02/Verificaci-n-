@@ -11,10 +11,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module address (
-input  [15:0] offset ;
-input  [15:0] segmento;
-output [19:0] address;
+    input  [15:0] offset,
+    input  [15:0] segmento,
+    output [19:0] address
 );
+
 // shift hacia la izquierda más suma del segmento
 assign address = {segmento << 4} + offset;
 

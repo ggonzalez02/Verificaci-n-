@@ -23,7 +23,7 @@ module register_bank(
     // Registros de Uso General
     reg[15:0] AX, BX, CX, DX;
 
-    // Registros Punteros y de √çndice
+    // Registros Punteros y de √?ndice
     reg[15:0] SP, BP, SI, DI;
 
     always @(posedge clk or posedge reset) begin
@@ -48,7 +48,7 @@ module register_bank(
     end
 
     always@(*) begin
-        case(reg_read1) //Lectura de Registro 1
+        case(Reg1) //Lectura de Registro 1
             3'h0: Data_Reg1 = AX;
             3'h1: Data_Reg1 = BX;
             3'h2: Data_Reg1 = CX;
@@ -61,7 +61,7 @@ module register_bank(
 
         endcase
 
-        case(reg_read2) //Lectura de Registro 2
+        case(Reg2) //Lectura de Registro 2
             3'h0: Data_Reg2 = AX;
             3'h1: Data_Reg2 = BX;
             3'h2: Data_Reg2 = CX;

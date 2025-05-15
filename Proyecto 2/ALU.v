@@ -8,7 +8,7 @@
 // Description: Módulo encargado de retornar la dirección
 //////////////////////////////////////////////////////////////////////////////////
 
-include "address.v"
+`include "address.v"
 
 module ALU (
     input [2:0] OP,
@@ -50,11 +50,14 @@ module ALU (
                 segmento = Data_Segment;
                 offset = Data_Reg1 + Data_Reg2 + Relative;
             end
-            default: 
+            default: begin
+                segmento = Data_Segment;
+                offset = Data_Reg1;
+            end
         endcase
     end
 
-    address Calculo (.offset(offset), .segmento(segmento), .address(address))
+    address Calculo (.offset(offset), .segmento(segmento), .address(address));
 
     assign Direction = address;
 
