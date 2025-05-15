@@ -24,6 +24,7 @@ module ALU (
     reg  [15:0] segmento;
     reg [19:0] address;
 
+    //A partir de OP, decidir el tipo de direccionamiento que se va a obtener
     always @(OP) begin
         case (OP)
             3'h0: begin
@@ -57,6 +58,7 @@ module ALU (
         endcase
     end
 
+    //Suma para obtener la señal de dirección
     address Calculo (.offset(offset), .segmento(segmento), .address(address));
 
     assign Direction = address;

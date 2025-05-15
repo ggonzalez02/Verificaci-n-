@@ -4,29 +4,30 @@
 //              Maricruz Campos                                                 
 //              Gabriel González                                                
 //  
-// Module Name: top
-// Description: Módulo top de la interfaz
+// Module Name: 8088Interface_tb2
+// Description: Testbench para probar la interfaz del 8088
 //////////////////////////////////////////////////////////////////////////////////
 
-module top (
-    input clk,
-    input reset,
-    input [2:0] OP,
-    input [2:0] Reg1,
-    input [2:0] Reg2,
-    inout RD_WR,
-    inout [15:0] Data,
-    output [19:0] Direction
-);
-    //Definicion de señales internas
+`include "interface.sv"
 
-    //Banco de registros
-
-    //Segmentos
-
-    //Queue
-
-    //ALU
-
+module 8088Interface_tb2;
     
+    //Interfaz
+    8088Interface bfm();
+    //Tester
+
+    //Scoreboard
+
+    //DUT
+    top DUT (
+    .clk(bfm.clk),
+    .reset(bfm.reset),
+    .OP(bfm.OP),
+    .Reg1(bfm.Reg1),
+    .Reg2(bfm.Reg2),
+    .RD_WR(bfm.RD_WR_pin),
+    .Data(bfm.Data_pin),
+    ,Direction(bfm.Direction)
+    );
+
 endmodule
