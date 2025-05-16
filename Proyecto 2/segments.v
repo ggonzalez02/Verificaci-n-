@@ -10,17 +10,17 @@
 
 module segments (
     //inputs
-    input wire clk;
-    input wire rst; 
-    input write_en; 
-    input  [1:0] reg_select; // 00 CS, 01 ES, 10 DS, 11 SS
-    input  [15:0] data;
+    input wire clk,
+    input wire rst, 
+    input write_en,
+    input  [1:0] reg_select, // 00 CS, 01 ES, 10 DS, 11 SS
+    input  [15:0] data,
 
     //outputs de segmentos 
-    output [15:0] cs_out;
-    output [15:0] ds_out;
-    output [15:0] ss_out;
-    output [15:0] es_out;
+    output [15:0] cs_out,
+    output [15:0] ds_out,
+    output [15:0] ss_out,
+    output [15:0] es_out
 );
 
 localparam CS = 2'b00;
