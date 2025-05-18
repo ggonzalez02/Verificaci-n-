@@ -4,7 +4,7 @@
 //              Maricruz Campos                                                 
 //              Gabriel González                                                
 //  
-// Module Name: Unidad de Generación de direcciones 
+// Module Name: address
 // Description: Contiene dos entradas y una salida, primero desplaza hacia la izquierda
 //              por 4 el segmento a utilizar y luego suma el offset de 16 bits para formar 
 //              una dirección de 20 bits.

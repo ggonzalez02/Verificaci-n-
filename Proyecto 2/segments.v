@@ -4,7 +4,7 @@
 //              Maricruz Campos                                                 
 //              Gabriel González                                                
 //  
-// Module Name: Registros de Segmentos
+// Module Name: segments
 // Description:
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -13,8 +13,8 @@ module segments (
     input wire clk,
     input wire rst, 
     input write_en, //0: Lectura, 1: Escritura
-    input  [2:0] reg_select, //000 CS, 001 ES, 010 DS, 011 SS, 100
-    input  [15:0] data,
+    input  [1:0] reg_select, //000: CS, 001: ES, 010: DS, 011: SS
+    input  [15:0] data, //Datos a escribir en los registros de segmento
     output [15:0] Data_Segment //Segmento de salida
 );
 
@@ -23,12 +23,11 @@ localparam CS = 3'b000;
 localparam DS = 3'b001;
 localparam SS = 3'b010;
 localparam ES = 3'b011;
-localparam IP = 3'b100;
 
 //Registros de segmento
-reg [15:0] cs_out, ds_out, ss_out, es_out, ip_out;
+reg [15:0] cs_out, ds_out, ss_out, es_out;
 
-always @(posedge clk or posedge rst ) begin
+always @(posedge clk or posedge rst) begin
     if (rst) begin
         cs_out <= 16'h0000;
         ds_out <= 16'h0000;
@@ -42,18 +41,17 @@ always @(posedge clk or posedge rst ) begin
             DS: ds_out <= data;
             SS: ss_out <= data;
             ES: es_out <= data;
-            IP: ip_out <= data;
         endcase 
     end
-    else
-    case (reg_select)
-        CS: Data_Segment <= cs_out;
-        DS: Data_Segment <= ds_out;
-        SS: Data_Segment <= ss_out;
-        ES: Data_Segment <= es_out;
-        IP: Data_Segment <= ip_out;
-    endcase
-        
+    else begin
+        case (reg_select)
+            CS: Data_Segment <= cs_out;
+            DS: Data_Segment <= ds_out;
+            SS: Data_Segment <= ss_out;
+            ES: Data_Segment <= es_out;
+        endcase
+    end
+    
     
 end
 

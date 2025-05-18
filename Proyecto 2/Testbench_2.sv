@@ -14,6 +14,7 @@ module 8088Interface_tb2;
     
     //Interfaz
     8088Interface bfm();
+    
     //Tester
 
     //Scoreboard

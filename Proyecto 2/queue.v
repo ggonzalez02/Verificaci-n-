@@ -5,7 +5,7 @@
 //              Gabriel González                                                
 //  
 // Module Name: queue
-// Description: cola de instrucciones 
+// Description: Pila encargada de la lectura de la instrucción
 //////////////////////////////////////////////////////////////////////////////////
 
 module queue (
@@ -17,7 +17,7 @@ module queue (
 );
 
 // Data -> R1 -> R2 -> R3 -> R4
-wire [7:0] OUT1,OUT2,OUT3,OUT4; 
+wire [7:0] OUT1, OUT2, OUT3, OUT4; 
 
 RegQ R4(clk, rst, EN, OUT3, OUT4);
 RegQ R3(clk, rst, EN, OUT2, OUT3);

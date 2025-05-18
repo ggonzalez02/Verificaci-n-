@@ -8,12 +8,11 @@
 // Description: Módulo encargado de retornar la dirección
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "address.v"
-
 module ALU (
     input [2:0] OP,
     input [15:0] Relative,
     input [15:0] Data_Segment,
+    input [15:0] Data_IP,
     input [15:0] Data_Reg1,
     input [15:0] Data_Reg2,
     output [19:0] Direction
@@ -29,7 +28,7 @@ module ALU (
         case (OP)
             3'h0: begin
                 segmento = Data_Segment;
-                offset = Data_Reg1;
+                offset = Data_IP;
             end
             3'h1: begin
                 segmento = Data_Segment;

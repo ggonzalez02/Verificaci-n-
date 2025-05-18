@@ -18,12 +18,11 @@ module register_bank(
     input wire [2:0] Reg2,          //Segundo registro de lectura
     output reg [15:0] Data_Reg1,    //Datos leídos del primer registro
     output reg [15:0] Data_Reg2     //Datos leídos del segundo registro
-
 );
     // Registros de Uso General
     reg[15:0] AX, BX, CX, DX;
 
-    // Registros Punteros y de �?ndice
+    // Registros Punteros y de �?ndice
     reg[15:0] SP, BP, SI, DI;
 
     always @(posedge clk or posedge reset) begin
@@ -58,7 +57,6 @@ module register_bank(
             3'h6: Data_Reg1 = SI;
             3'h7: Data_Reg1 = DI;
             default: Data_Reg1 = 16'h0000;
-
         endcase
 
         case(Reg2) //Lectura de Registro 2

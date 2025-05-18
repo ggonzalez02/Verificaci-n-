@@ -4,21 +4,17 @@
 //              Maricruz Campos                                                 
 //              Gabriel González                                                
 //  
-// Module Name: RegQ
-// Description: Registros para mantener la data en el queue
+// Module Name: buffer_tri_state
+// Description: Buffer tri estados para el uso del bus de datos
 //////////////////////////////////////////////////////////////////////////////////
 
-module RegQ (clk, rst, EN, D, Q);
-input clk; 
-input rst;
-input EN; //0: Mantener Q, 1: Escribir en Q
-input [7:0] D; //Dato de entrada
-output  [7:0] Q; //Dato de salida
+module buffer_tri_state (
+    input [7:0] in,     //Dato de entrada
+    input EN,           //0: Lectura, 1: Escritura
+    output [7:0] out    //Dato de salida
+);
 
-always @(posedge clk or posedge rst) begin
-    if (rst)
-        Q <= 8'h00;
-    else if (EN)
-        Q <= D;
-end
-endmodule 
+    // Buffer tristate para controlar la dirección de los datos
+    assign out = (!EN) ? in : 8'bZ;   // Si EN = 0, se activa la función de lectura, si es 1 se activa la escritura
+    
+endmodule
