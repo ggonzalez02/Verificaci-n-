@@ -7,6 +7,7 @@
 // Module Name: RegistrosQueue
 // Description: registros para mantener la data en el queue
 //////////////////////////////////////////////////////////////////////////////////
+
 module RegQ (clk, rst, EN, D, Q);
 input clk; 
 input rst;

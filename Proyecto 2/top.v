@@ -15,7 +15,7 @@ module top (
     input [2:0] Reg1,
     input [2:0] Reg2,
     inout RD_WR,
-    inout [15:0] Data,
+    inout [7:0] Data,
     output [19:0] Direction
 );
     //Definicion de señales internas
