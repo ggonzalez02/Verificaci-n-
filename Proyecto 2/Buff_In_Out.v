@@ -31,6 +31,6 @@ module Buff_In_Out (
 
     //Buffers tri estado
     buffer_tri_state P1 (.in(out_reg), .EN(Internal_RD_WR), .out(DataBus));
-    buffer_tri_state P1 (.in(out_reg), .EN(!RD_WR), .out(InternalBus));
+    buffer_tri_state P2 (.in(out_reg), .EN(!RD_WR), .out(InternalBus));
     
 endmodule

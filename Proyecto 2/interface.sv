@@ -8,18 +8,18 @@
 // Description: Módulo de interfaz para los bancos de pruebas
 //////////////////////////////////////////////////////////////////////////////////
 
-interface 8088Interface;
+interface interface_8088;
     //Señales de entrada y salida del DUT
-    bit clk,
-    bit reset,
-    logic [2:0] OP,
-    logic [2:0] Reg1,
-    logic [2:0] Reg2,
-    logic RD_WR_pin,            //Señal direccional para el DUT
-    logic RD_WR_drive,          //Señal local 
+    bit clk;
+    bit reset;
+    logic [2:0] OP;
+    logic [2:0] Reg1;
+    logic [2:0] Reg2;
+    logic RD_WR_pin;            //Señal direccional para el DUT
+    logic RD_WR_drive;          //Señal local 
     logic [15:0] Data_pin;      //Señal direccional para el DUT
     logic [15:0] Data_drive;    //Señal local
-    logic [19:0] Direction
+    logic [19:0] Direction;
 
     //Asignación para tener una señal que sea de entrada y salida
     assign Data_pin = Data_drive;
@@ -33,16 +33,20 @@ interface 8088Interface;
         clk = 0;
         forever #5 clk = ~clk; 
     end
+    
+    //Funci�n para esperar n veces el flanco de subida del clock
+    task automatic wait_n_clks(input int n);
+        repeat(n) @(posedge clk);
+    endtask
 
     //Resetear la interfaz
-    task Reset_8088Interface taskName(arguments);
+    task reset_interface();
         reset = 0;
-        @negedge(clk); //Esperar un ciclo
+        wait_n_clks (2);
         reset = 1;
-        @negedge(clk);
-        @negedge(clk);
+        wait_n_clks (3);
         reset = 0;
-    endtask    
+    endtask
 
 
 endinterface //8088Interface
