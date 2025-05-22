@@ -27,7 +27,7 @@ module Buff_In_Out (
 
     //Registro
     wire [7:0] out_reg;
-    RegistroQ R1 (.clk(clk), .rst(rst), .EN(!Internal_RD_WR | RD_WR), .D(out_mux), (out_reg));
+    RegQ R1 (.clk(clk), .rst(rst), .EN(!Internal_RD_WR | RD_WR), .D(out_mux), (out_reg));
 
     //Buffers tri estado
     buffer_tri_state P1 (.in(out_reg), .EN(Internal_RD_WR), .out(DataBus));
