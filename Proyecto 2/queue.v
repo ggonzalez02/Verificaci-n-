@@ -9,11 +9,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module queue (
-    input EN,
+    input EN, //Señal de habilitación
     input clk,
     input rst,
-    input  [7:0] data,
-    output [31:0] Data_Q
+    input  [7:0] data, //Dato de entrada
+    output [31:0] Data_Q //Dato de salida
 );
 
 // Data -> R1 -> R2 -> R3 -> R4

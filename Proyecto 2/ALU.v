@@ -9,13 +9,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module ALU (
-    input [2:0] OP,
-    input [15:0] Relative,
-    input [15:0] Data_Segment,
-    input [15:0] Data_IP,
-    input [15:0] Data_Reg1,
-    input [15:0] Data_Reg2,
-    output [19:0] Direction
+    input [2:0] OP,                 //Señal que indica el tipo de direccionamiento
+    input [15:0] Relative,          //Valor del relativo para el direccionamiento
+    input [15:0] Data_Segment,      //Datos del registro dee segmento
+    input [15:0] Data_IP,           //Datos del registro IP
+    input [15:0] Data_Reg1,         //Datos del primer registro de lectura del banco de registros
+    input [15:0] Data_Reg2,         //Datos del segundo registro de lectura del banco de registros
+    output [19:0] Direction         //Dirección resultante
     );
 
     //Definición de señales internas para usar el módulo address

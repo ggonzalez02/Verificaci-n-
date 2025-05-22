@@ -11,25 +11,25 @@
 module top (
     input clk,
     input reset,
-    input [2:0] OP,
-    input RD_WR_Regs,
-    input [2:0] Reg_Write,
-    input [2:0] Reg1,
-    input [2:0] Reg2,
-    input [15:0] Data_Regs,
-    input [15:0] Relative,
-    input RD_WR_Segments,
-    input [1:0] Segment,
-    input [15:0] Data_Segments,
-    input EN_IP,
-    input SEL_IP,
-    input [7:0] IP,
-    input Internal_RD_WR,
-    inout RD_WR,
-    inout [7:0] Bus,
-    inout [7:0] Data,
-    output [31:0] Instruction,
-    output [19:0] Direction
+    input [2:0] OP,                 //Tipo de direccionamiento a realizar
+    input RD_WR_Regs,               //Señal de escritura-lectura para el banco de registros
+    input [2:0] Reg_Write,          //Registro en el que se va a escribir en el banco de registros
+    input [2:0] Reg1,               //Primer registro de lectura del banco de registros
+    input [2:0] Reg2,               //Segundo registro de lectura del banco de registros
+    input [15:0] Data_Regs,         //Datos a escribir en el banco de registros
+    input [15:0] Relative,          //Relativo para usar en el direccionamiento
+    input RD_WR_Segments,           //Señal de escritura-lectura para los registros de segmento
+    input [1:0] Segment,            //Registro en el que se va a escribir en los registros de segmento
+    input [15:0] Data_Segments,     //Datos a escribir en los registros de segmento
+    input EN_IP,                    //Señal de habilitación para el registro IP
+    input SEL_IP,                   //Selección del tipo de escritura para el registro IP
+    input [7:0] IP,                 //Datos a escribir en el registro IP
+    input Internal_RD_WR,           //Señal interna de escritura para el buffer de entrada y salida
+    inout RD_WR,                    //Señal de escritura para el buffer de entrada y salida
+    inout [7:0] Bus,                //Bus de datos para la interfaz
+    inout [7:0] Data,               //Señal de datos para la interfaz
+    output [31:0] Instruction,      //Señal de instrucción resultante
+    output [19:0] Direction         //Señal de dirección resultante
 );
     //Definicion de señales internas
     wire [15:0] Data_Reg1, Data_Reg2, Data_Segment, Data_IP;
