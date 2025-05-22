@@ -22,8 +22,8 @@ module RegIP (
     //Multiplexor para decidir el valor a escribir en Q
     always @(Q or D or SEL) begin
         case (SEL)
-            1'b0: Data_In = Q + 1;
-            1'b1: Data_In = D; 
+            1'b0: Data_In <= Q + 1;
+            1'b1: Data_In <= D; 
         endcase
     end
 
