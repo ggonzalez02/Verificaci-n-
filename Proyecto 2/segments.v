@@ -15,7 +15,7 @@ module segments (
     input write_en, //0: Lectura, 1: Escritura
     input  [1:0] reg_select, //000: CS, 001: ES, 010: DS, 011: SS
     input  [15:0] data, //Datos a escribir en los registros de segmento
-    output [15:0] Data_Segment //Segmento de salida
+    output reg [15:0] Data_Segment //Segmento de salida
 );
 
 //Parámetros internos para facilitar lectura

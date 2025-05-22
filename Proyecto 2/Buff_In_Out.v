@@ -20,14 +20,14 @@ module Buff_In_Out (
     reg [7:0] out_mux;
     always @(InternalBus or DataBus or Internal_RD_WR) begin
         case (Internal_RD_WR)
-            1'b0: out_mux = InternalBus;
-            1'b1: out_mux = DataBus; 
+            1'b0: out_mux <= InternalBus;
+            1'b1: out_mux <= DataBus; 
         endcase
     end
 
     //Registro
     wire [7:0] out_reg;
-    RegQ R1 (.clk(clk), .rst(rst), .EN(!Internal_RD_WR | RD_WR), .D(out_mux), (out_reg));
+    RegQ R1 (.clk(clk), .rst(rst), .EN(!Internal_RD_WR | RD_WR), .D(out_mux), .Q(out_reg));
 
     //Buffers tri estado
     buffer_tri_state P1 (.in(out_reg), .EN(Internal_RD_WR), .out(DataBus));

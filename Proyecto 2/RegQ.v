@@ -13,7 +13,7 @@ input clk;
 input rst;
 input EN; //0: Mantener Q, 1: Escribir en Q
 input [7:0] D; //Dato de entrada
-output  [7:0] Q; //Dato de salida
+output reg [7:0] Q; //Dato de salida
 
 always @(posedge clk or posedge rst) begin
     if (rst)

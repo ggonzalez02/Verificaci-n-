@@ -14,7 +14,7 @@ module RegIP (
     input EN,       //0: Mantener Q, 1: Escribir en Q  
     input SEL,      //0: Sumar 1 a Q, 1: Escribir en Data_In
     input [7:0] D,  //Dato de entrada
-    output [7:0] Q  //Dato de salida
+    output reg [7:0] Q  //Dato de salida
 );
     //Registro interno de escritura
     reg [7:0] Data_In;
