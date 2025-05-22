@@ -43,7 +43,7 @@ module top (
                       .data(Data_Segments), .Data_Segment(Data_Segment));
 
     //Registro IP
-    RegIP IP(.clk(clk), .rst(reset), .EN(EN_IP), .SEL(SEL_IP), .D(IP), .Q(Data_IP));
+    RegIP R_IP(.clk(clk), .rst(reset), .EN(EN_IP), .SEL(SEL_IP), .D(IP), .Q(Data_IP));
 
     //Queue
     queue Queue(.EN(), .clk(clk), .rst(reset), .data(Bus), .Data_Q(Instruction));
