@@ -29,11 +29,18 @@ module Testbench_1;
     reg EN_IP;
     reg SEL_IP;
     reg [7:0] IP;
+    reg EN;                     
     reg Internal_RD_WR;
 
-    wire RD_WR;
-    wire [7:0] Bus;
-    wire [7:0] Data;
+    // Señales bidireccionales
+    reg RD_WR_drive;
+    reg [7:0] Bus_drive;
+    reg [7:0] Data_drive;
+    reg drive_enable;
+   
+    assign RD_WR = drive_enable ? RD_WR_drive : 1'bz;
+    assign Bus = drive_enable ? Bus_drive : 8'bz;
+    assign Data = drive_enable ? Data_drive : 8'bz;
     
     wire [31:0] Instruction;
     wire [19:0] Direction;
@@ -55,6 +62,7 @@ module Testbench_1;
         .EN_IP(EN_IP),
         .SEL_IP(SEL_IP),
         .IP(IP),
+        .EN(EN),                
         .Internal_RD_WR(Internal_RD_WR),
         .RD_WR(RD_WR),
         .Bus(Bus),
@@ -69,7 +77,7 @@ module Testbench_1;
         forever #5 clk = ~clk; 
     end
 
-    integer log_file; // Declaración del archivo log
+    integer log_file; 
 
     // Proceso principal
     initial begin
@@ -92,7 +100,13 @@ module Testbench_1;
         EN_IP = 0;
         SEL_IP = 0;
         IP = 0;
+        EN = 0;                 
         Internal_RD_WR = 0;
+        
+        drive_enable = 0;
+        RD_WR_drive = 0;
+        Bus_drive = 8'h00;
+        Data_drive = 8'h00;
         
         // Desactivar reset
         #20; reset = 0;
@@ -182,6 +196,15 @@ module Testbench_1;
         SEL_IP = 0; // Sumar 1 a Q
         #20;
         EN_IP = 0; // Mantener Q
+        #10;
+        
+        // Prueba de Queue
+        EN = 1; // Habilitar queue
+        drive_enable = 1; // Habilitar drivers
+        Bus_drive = 8'h55; // Dato de prueba
+        #20;
+        EN = 0; // Deshabilitar queue
+        drive_enable = 0; // Deshabilitar drivers
         #10;
         
         //Cerrar archivo tipo log
