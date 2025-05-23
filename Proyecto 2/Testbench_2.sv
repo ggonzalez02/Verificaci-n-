@@ -14,20 +14,14 @@
 // Probar la ALU 
 // Escribir a IP 
 // Shift en el queue 
-    bit [15:0] banc_seg[8]; // 4 segmentos
-    bit [7:0]  reg_IP;      // Registro IP
-    bit [7:0]  D_queue[4]; // 4 registros del queue
-include "interface.sv"
 
-module 8088Interface_tb2;
+include "interface.sv"
+module Interface_tb2;
     
     //Interfaz
     interface_8088 bfm();
 
-    initial begin
-        bfm.clk = 0;
-        forever #5 bfm.clk = ~bfm.clk; // 10ns
-    end 
+
     
     //Tester
    
@@ -46,10 +40,7 @@ module 8088Interface_tb2;
         .RD_WR_seg(bfm.RD_WR_seg),
         .Data_seg(bfm.Data_seg),
         .Reg_Write(bfm.Reg_Write),
-
-
-
-
+        .Reg_Read(bfm.Reg_Read),
         .Direction(bfm.Direction)
     );
 
@@ -64,7 +55,7 @@ class Scoreboard;
         banc_reg[indice] = data;
     endfunction
     // función lee el registro
-    function bit RD_reg(int indice,bit [15:0] data_actual;);
+    function bit RD_reg(int indice,bit [15:0] data_actual);
         return (data_actual === banc_reg[indice]);
     endfunction
 
@@ -75,9 +66,6 @@ class Tester;
     virtual interface_8088 bfm;
     Scoreboard scb;
     
-    
-
-
     task WR_reg(int indice, bit [15:0] data);
         bfm.RD_WR_Regs = 1;
         bfm.Reg_Write = indice;
@@ -86,6 +74,14 @@ class Tester;
         @(posedge bfm.clk);
         bfm.RD_WR_Regs = 0;
         scb.WR_reg(indice, data);
+    endtask
+
+    task RD_reg (int indice, output bit [15:0] data_actual)
+        bfm.RD_WR_Regs = 0;
+        bfm.Reg1 = indice; 
+        @(posedge bfm.clk);
+        @(posedge bfm.clk);
+        data_actual = DUT.Registers.Data_Reg1; // path del output de reg1 en top.v 
     endtask
 
 endclass
