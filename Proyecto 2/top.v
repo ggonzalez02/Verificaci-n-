@@ -37,7 +37,7 @@ module top (
 
     //Banco de registros
     register_bank Registers(.clk(clk), .reset(reset), .RD_WR(RD_WR_Regs), .reg_write(Reg_Write), .Data(Data_Regs),
-                            .Reg1(Reg1), .Reg2(Reg2), .Data_Reg1(Data_Reg1), .Data_Reg2(Data_Reg1));
+                            .Reg1(Reg1), .Reg2(Reg2), .Data_Reg1(Data_Reg1), .Data_Reg2(Data_Reg2));
     
     //Segmentos
     segments Segments(.clk(clk), .rst(reset), .write_en(RD_WR_Segments), .reg_select(Segment),

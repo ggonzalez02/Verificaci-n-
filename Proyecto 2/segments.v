@@ -19,10 +19,10 @@ module segments (
 );
 
 //Parámetros internos para facilitar lectura
-localparam CS = 3'b000;
-localparam DS = 3'b001;
-localparam SS = 3'b010;
-localparam ES = 3'b011;
+localparam CS = 3'b00;
+localparam DS = 3'b01;
+localparam SS = 3'b10;
+localparam ES = 3'b11;
 
 //Registros de segmento
 reg [15:0] cs_out, ds_out, ss_out, es_out;
