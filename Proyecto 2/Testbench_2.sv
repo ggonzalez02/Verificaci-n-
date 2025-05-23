@@ -15,60 +15,7 @@
 // Escribir a IP 
 // Shift en el queue 
 
-include "interface.sv"
-module Interface_tb2;
-    
-    //Interfaz
-    interface_8088 bfm();
-    //Tester
-    //Scoreboard
-    //DUT
-    top DUT ( 
-        // Mismos que hay en el top.v
-        .clk(bfm.clk),
-        .reset(bfm.reset),
-        .OP(bfm.OP),
-        .Reg1(bfm.Reg1),
-        .Reg2(bfm.Reg2),
-        .RD_WR_Regs(bfm.RD_WR_Regs),
-        .Data_Regs(bfm.Data_Regs),
-        .RD_WR_Segments(bfm.RD_WR_Segments),
-        .Data_Segments(bfm.Data_Segments),
-        .Reg_Write(bfm.Reg_Write),
-        .Direction(bfm.Direction)
-    );
-
-        
-    // ADD HERE:
-    initial begin
-        Scoreboard scb;
-        Tester tester;
-        
-        // Create objects
-        scb = new();
-        tester = new(bfm);
-        tester.scb = scb;
-        
-        // Initialize signals
-        bfm.reset_interface();
-        
-        // Run tests
-        tester.WR_reg(0, 16'h1234);
-        tester.WR_reg(1, 16'h5678);
-        
-        // Verify
-        bit [15:0] data;
-        tester.RD_reg(0, data);
-        if(scb.RD_reg(0, data)) 
-            $display("PASS");
-        else 
-            $display("FAIL");
-        
-        #50 $finish;
-    end
-
-
-endmodule
+`include "interface.sv"
 
 class Scoreboard; 
     bit [15:0] banc_reg[8]; // 8 registros
@@ -104,12 +51,69 @@ class Tester;
         scb.WR_reg(indice, data);
     endtask
 
-    task RD_reg (int indice, output bit [15:0] data_actual)
+    task RD_reg (int indice, output bit [15:0] data_actual);
         bfm.RD_WR_Regs = 0;
         bfm.Reg1 = indice; 
         @(posedge bfm.clk);
         @(posedge bfm.clk);
-        data_actual = DUT.Registers.Data_Reg1; // path del output de reg1 en top.v 
+        data_actual = bfm.Data_Reg1_out; // path del output de reg1 en top.v 
     endtask
 
 endclass
+module Interface_tb2;
+    
+    //Interfaz
+    interface_8088 bfm();
+    //Tester
+    //Scoreboard
+    //DUT
+    top DUT ( 
+        // Mismos que hay en el top.v
+        .clk(bfm.clk),
+        .reset(bfm.reset),
+        .OP(bfm.OP),
+        .Reg1(bfm.Reg1),
+        .Reg2(bfm.Reg2),
+        .RD_WR_Regs(bfm.RD_WR_Regs),
+        .Data_Regs(bfm.Data_Regs),
+        .RD_WR_Segments(bfm.RD_WR_Segments),
+        .Data_Segments(bfm.Data_Segments),
+        .Reg_Write(bfm.Reg_Write),
+        .Direction(bfm.Direction),
+        .Data(bfm.Data),
+        .Data_Reg1_out(bfm.Data_Reg1_out),
+        .Data_Reg2_out(bfm.Data_Reg2_out)
+    );
+
+    
+    // ADD HERE:
+    initial begin
+        Scoreboard scb;
+        Tester tester;
+        
+        // Create objects
+        scb = new();
+        tester = new(bfm);
+        tester.scb = scb;
+        
+        // Initialize signals
+        bfm.reset_interface();
+        
+        // Run tests
+        tester.WR_reg(0, 16'h1234);
+        tester.WR_reg(1, 16'h5678);
+        
+        // Verify
+        
+        tester.RD_reg(0, bfm.Data);
+        if(scb.RD_reg(0, bfm.Data)) 
+            $display("PASS");
+        else 
+            $display("FAIL");
+        
+        #50 $finish;
+    end
+
+
+endmodule
+
