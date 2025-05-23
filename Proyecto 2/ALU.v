@@ -21,7 +21,7 @@ module ALU (
     //Definición de señales internas para usar el módulo address
     reg [15:0] offset ;
     reg  [15:0] segmento;
-    reg [19:0] address;
+    wire [19:0] address;
 
     //A partir de OP, decidir el tipo de direccionamiento que se va a obtener
     always @(OP) begin
