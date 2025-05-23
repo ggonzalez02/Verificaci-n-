@@ -86,7 +86,7 @@ module Interface_tb2;
     );
 
     
-    // ADD HERE:
+
     initial begin
         Scoreboard scb;
         Tester tester;
