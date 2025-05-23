@@ -33,7 +33,8 @@ module top (
     output [19:0] Direction         //Señal de dirección resultante
 );
     //Definicion de señales internas
-    wire [15:0] Data_Reg1, Data_Reg2, Data_Segment, Data_IP;
+    wire [15:0] Data_Reg1, Data_Reg2, Data_Segment;
+    wire [7:0] Data_IP;
 
     //Banco de registros
     register_bank Registers(.clk(clk), .reset(reset), .RD_WR(RD_WR_Regs), .reg_write(Reg_Write), .Data(Data_Regs),
