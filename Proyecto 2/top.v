@@ -24,6 +24,7 @@ module top (
     input EN_IP,                    //Señal de habilitación para el registro IP
     input SEL_IP,                   //Selección del tipo de escritura para el registro IP
     input [7:0] IP,                 //Datos a escribir en el registro IP
+    input EN,
     input Internal_RD_WR,           //Señal interna de escritura para el buffer de entrada y salida
     inout RD_WR,                    //Señal de escritura para el buffer de entrada y salida
     inout [7:0] Bus,                //Bus de datos para la interfaz
@@ -46,7 +47,7 @@ module top (
     RegIP R_IP(.clk(clk), .rst(reset), .EN(EN_IP), .SEL(SEL_IP), .D(IP), .Q(Data_IP));
 
     //Queue
-    queue Queue(.EN(), .clk(clk), .rst(reset), .data(Bus), .Data_Q(Instruction));
+    queue Queue(.EN(EN), .clk(clk), .rst(reset), .data(Bus), .Data_Q(Instruction));
 
     //ALU
     ALU Dir(.OP(OP), .Relative(Relative), .Data_Segment(Data_Segment), .Data_IP(Data_IP),
