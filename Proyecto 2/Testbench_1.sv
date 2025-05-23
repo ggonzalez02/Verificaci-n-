@@ -38,16 +38,14 @@ module Testbench_1;
     reg [7:0] Data_drive;
     reg drive_RD_WR;
     reg drive_Bus;
-    reg drive_Data;
 
     wire RD_WR;
     wire [7:0] Bus;
     wire [7:0] Data;
     
-    // Asignación de las señales bidireccionales 
-    assign RD_WR = drive_RD_WR ? RD_WR_drive : 1'b0;  
-    assign Bus = drive_Bus ? Bus_drive : 8'h00;         
-    assign Data = drive_Data ? Data_drive : 8'h00;    
+    // Asignación de las señales bidireccionales
+    assign RD_WR = drive_RD_WR ? RD_WR_drive : 1'bz;        
+    assign Bus = drive_Bus ? Bus_drive : 8'bzzzzzzzz;       
     
     wire [31:0] Instruction;
     wire [19:0] Direction;
@@ -111,7 +109,6 @@ module Testbench_1;
        
         drive_RD_WR = 1;
         drive_Bus = 1;
-        drive_Data = 1;
         RD_WR_drive = 0;
         Bus_drive = 8'h00;
         Data_drive = 8'h00;
@@ -173,7 +170,7 @@ module Testbench_1;
         EN = 1; // Habilitar queue
         drive_Bus = 1; // Controlar Bus
         
-        // Sincronización con clk para cargar los datos en orden
+        // Cargar datos en el bus
         @(posedge clk);
         Bus_drive = 8'hA1;
         @(posedge clk);
@@ -188,12 +185,10 @@ module Testbench_1;
         Bus_drive = 8'h00;
         #20; 
         
-        // Liberar control de las señales bidireccionales gradualmente
-        drive_Bus = 0;    // Liberar Bus primero
+        // Desactivar señales bidireccionales
+        drive_Bus = 0;   
         #10;
-        drive_Data = 0;   // Liberar Data 
-        #10;
-        drive_RD_WR = 0;  // Liberar RD_WR al final
+        drive_RD_WR = 0; 
         #10;
         
         // Prueba de los modos de direccionamiento
