@@ -29,14 +29,15 @@ module Interface_tb2;
 
 
     //DUT
-    top DUT (
+    top DUT ( 
+        // Mismos que hay en el top.v
         .clk(bfm.clk),
         .reset(bfm.reset),
         .OP(bfm.OP),
         .Reg1(bfm.Reg1),
         .Reg2(bfm.Reg2),
-        .RD_WR_regs(bfm.RD_WR_regs),
-        .Data_regs(bfm.Data_regs),
+        .RD_WR_Regs(bfm.RD_WR_Regs),
+        .Data_Regs(bfm.Data_Regs),
         .RD_WR_seg(bfm.RD_WR_seg),
         .Data_seg(bfm.Data_seg),
         .Reg_Write(bfm.Reg_Write),

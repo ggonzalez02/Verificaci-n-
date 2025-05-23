@@ -21,6 +21,22 @@ interface interface_8088;
     logic [15:0] Data_drive;    //Señal local
     logic [19:0] Direction;
 
+    logic RD_WR_Regs;
+    logic [2:0] Reg_Write;
+    logic [15:0] Data_Regs;
+    logic [15:0] Relative;
+    logic RD_WR_Segments;
+    logic [1:0] Segment;
+    logic [15:0] Data_Segments;
+    logic EN_IP;
+    logic SEL_IP;
+    logic [7:0] IP;
+    logic EN;
+    logic Internal_RD_WR;
+    logic [7:0] Bus;
+    logic [7:0] Data;
+    logic [31:0] Instruction;
+
     //Asignación para tener una señal que sea de entrada y salida
     assign Data_pin = Data_drive;
     assign RD_WR_pin = RD_WR_drive;
