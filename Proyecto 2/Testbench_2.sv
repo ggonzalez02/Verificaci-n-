@@ -46,7 +46,8 @@ module Interface_tb2;
         .IP(bfm.IP),
         .EN(bfm.EN),
         .Internal_RD_WR(bfm.Internal_RD_WR),
-        .Instruction(bfm.Instruction)
+        .Instruction(bfm.Instruction),
+        .Data_Segment_out(bfm.Data_Segment_out)
     );
     
     integer log_file; 
@@ -64,8 +65,7 @@ module Interface_tb2;
     class Scoreboard; 
     // Registros 
         bit [15:0] banc_reg[8]; // 8 registros
-        
-        
+    
         // función escribe al registro 
         function void WR_reg(int indice,bit [15:0] data);
             banc_reg[indice] = data;
@@ -77,6 +77,7 @@ module Interface_tb2;
 
     // Segmentos 
         bit [15:0] seg_reg[4];// 4 segmentos 
+        
         // función escribe al segmento 
         function void WR_seg(int indice,bit [15:0] data);
             seg_reg[indice] = data;
@@ -85,7 +86,24 @@ module Interface_tb2;
         function bit RD_seg(int indice,bit [15:0] data_actual);
             return (data_actual === seg_reg[indice]);
         endfunction
-
+        
+    //Check list 
+        //Registros
+        function void check_reg(int indice, bit [15:0] data_actual);
+        if (data_actual === banc_reg[indice]) begin
+            $display("SCOREBOARD: REG[%0d] - PASS: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+        end else begin
+            $error("SCOREBOARD: REG[%0d] - FAIL: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+        end
+        endfunction
+        //Segmentos 
+        function void check_seg(int indice, bit [15:0] data_actual);
+        if (data_actual === seg_reg[indice]) begin
+            $display("SCOREBOARD: REG[%0d] - PASS: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+        end else begin
+            $error("SCOREBOARD: REG[%0d] - FAIL: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+        end
+        endfunction
 
     endclass
 
@@ -115,6 +133,7 @@ module Interface_tb2;
             @(posedge bfm.clk);
             @(posedge bfm.clk);
             data_actual = bfm.Data_Reg1_out; // path del output de reg1 en top.v 
+            scb.check_reg(indice, data_actual);
         endtask
 
         // Segmentos 
@@ -134,6 +153,7 @@ module Interface_tb2;
             @(posedge bfm.clk);
             @(posedge bfm.clk);
             data = bfm.Data_Segment_out;
+            scb.check_seg(indice, data_actual);
         endtask
     endclass
     
@@ -158,26 +178,16 @@ module Interface_tb2;
         tester.WR_reg(0, 16'h1234); //AX
         tester.WR_reg(1, 16'h5678); //BX
 
+        tester.RD_reg(0, data);
+
         //Segs
         tester.WR_seg(0, 16'h1000); // CS
         tester.WR_seg(1, 16'h2000); // DS
         tester.WR_seg(2, 16'h3000); // SS
         tester.WR_seg(3, 16'h4000); // ES
-        
-        // Verificación 
-        
-        tester.RD_reg(0, data);
-        if(scb.RD_reg(0, data)) 
-            $display("PASS");
-        else 
-            $display("FAIL");
-
-         
+    
         tester.RD_seg(0, data);
-        if(scb.RD_seg(0, data)) 
-            $display("PASS");
-        else 
-            $display("FAIL");
+
         
         #50 $finish;
     end
@@ -193,3 +203,4 @@ module Interface_tb2;
 
 
 endmodule
+

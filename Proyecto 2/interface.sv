@@ -39,6 +39,7 @@ interface interface_8088;
 
     logic [15:0] Data_Reg1_out;
     logic [15:0] Data_Reg2_out;
+    logic [15:0] Data_Segment_out;
 
     //Asignación para tener una señal que sea de entrada y salida
     assign Data_pin = Data_drive;
