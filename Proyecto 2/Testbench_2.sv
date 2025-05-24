@@ -17,6 +17,7 @@
 
 `include "interface.sv"
 
+
 module Interface_tb2;
     
     //Interfaz
@@ -54,8 +55,10 @@ module Interface_tb2;
 
     initial begin
         // Abrir archivo tipo log
+      /*
         log_file = $fopen("Testbench_1.log", "w");
         $fdisplay(log_file, "Time | reset | OP | RD_WR_Regs | Reg_Write | EN_IP | Internal_RD_WR | Direction");
+       */
 
         // Para el wave form en playground
         $dumpfile("dump.vcd");
@@ -91,17 +94,18 @@ module Interface_tb2;
         //Registros
         function void check_reg(int indice, bit [15:0] data_actual);
         if (data_actual === banc_reg[indice]) begin
-            $display("SCOREBOARD: REG[%0d] - PASS: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+            $display("SCOREBOARD: REG[%0d] - PASS: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], data_actual);
         end else begin
-            $error("SCOREBOARD: REG[%0d] - FAIL: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+            $error("SCOREBOARD: REG[%0d] - FAIL: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], data_actual);
         end
         endfunction
+      
         //Segmentos 
         function void check_seg(int indice, bit [15:0] data_actual);
         if (data_actual === seg_reg[indice]) begin
-            $display("SCOREBOARD: REG[%0d] - PASS: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+            $display("SCOREBOARD: REG[%0d] - PASS: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], data_actual);
         end else begin
-            $error("SCOREBOARD: REG[%0d] - FAIL: Esperado 0x%h, Obtuvo 0x%h", indice, banc_reg[indice], actual_data);
+          $error("SCOREBOARD: REG[%0d] - FAIL: Esperado 0x%h, Obtuvo 0x%h", indice, seg_reg[indice], data_actual);
         end
         endfunction
 
@@ -153,7 +157,7 @@ module Interface_tb2;
             @(posedge bfm.clk);
             @(posedge bfm.clk);
             data = bfm.Data_Segment_out;
-            scb.check_seg(indice, data_actual);
+            scb.check_seg(indice, data);
         endtask
     endclass
     
@@ -177,9 +181,21 @@ module Interface_tb2;
         //Regs
         tester.WR_reg(0, 16'h1234); //AX
         tester.WR_reg(1, 16'h5678); //BX
+        tester.WR_reg(2, 16'h8683); //CX
+        tester.WR_reg(3, 16'h3234); //DX
+        tester.WR_reg(4, 16'h4123); //SP
+        tester.WR_reg(5, 16'h6909); //BP
+        tester.WR_reg(6, 16'h3133); //SI
+        tester.WR_reg(7, 16'h0189); //DI
 
         tester.RD_reg(0, data);
-
+        tester.RD_reg(1, data);
+        tester.RD_reg(2, data);
+        tester.RD_reg(3, data);
+        tester.RD_reg(4, data);
+        tester.RD_reg(5, data);
+        tester.RD_reg(6, data);
+        tester.RD_reg(7, data);
         //Segs
         tester.WR_seg(0, 16'h1000); // CS
         tester.WR_seg(1, 16'h2000); // DS
@@ -187,11 +203,14 @@ module Interface_tb2;
         tester.WR_seg(3, 16'h4000); // ES
     
         tester.RD_seg(0, data);
+        tester.RD_seg(1, data);
+        tester.RD_seg(2, data);
+        tester.RD_seg(3, data);
 
         
         #50 $finish;
     end
-
+/*
     initial begin
         forever begin
             #10;
@@ -200,7 +219,6 @@ module Interface_tb2;
         end
     end
 
-
+*/
 
 endmodule
-
