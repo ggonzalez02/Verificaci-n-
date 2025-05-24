@@ -7,7 +7,6 @@
 // Module Name: interface
 // Description: Módulo de interfaz para los bancos de pruebas
 //////////////////////////////////////////////////////////////////////////////////
-
 interface interface_8088;
     //Señales de entrada y salida del DUT
     bit clk;
@@ -15,9 +14,9 @@ interface interface_8088;
     logic [2:0] OP;
     logic [2:0] Reg1;
     logic [2:0] Reg2;
-    logic RD_WR_pin;            //Señal direccional para el DUT
+    wire RD_WR_pin;            //Señal direccional para el DUT
     logic RD_WR_drive;          //Señal local 
-    logic [15:0] Data_pin;      //Señal direccional para el DUT
+  wire [7:0] Data_pin;      //Señal direccional para el DUT
     logic [15:0] Data_drive;    //Señal local
     logic [19:0] Direction;
 
@@ -33,13 +32,16 @@ interface interface_8088;
     logic [7:0] IP;
     logic EN;
     logic Internal_RD_WR;
-    logic [7:0] Bus;
+    wire [7:0] Bus;
     logic [7:0] Data;
     logic [31:0] Instruction;
 
     logic [15:0] Data_Reg1_out;
     logic [15:0] Data_Reg2_out;
     logic [15:0] Data_Segment_out;
+
+    wire RD_WR_pin;
+    wire [7:0] Data_pin;
 
     //Asignación para tener una señal que sea de entrada y salida
     assign Data_pin = Data_drive;
