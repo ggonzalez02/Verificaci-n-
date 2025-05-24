@@ -34,7 +34,8 @@ module top (
     output [31:0] Instruction,      //Señal de instrucción resultante
     output [19:0] Direction,         //Señal de dirección resultante
     output [15:0] Data_Reg1_out,
-    output [15:0] Data_Reg2_out
+    output [15:0] Data_Reg2_out,
+    output [15:0] Data_Segment_out
 );
     //Definicion de señales internas
     wire [15:0] Data_Reg1, Data_Reg2, Data_Segment;
@@ -42,6 +43,7 @@ module top (
 
     assign Data_Reg1_out = Data_Reg1;
     assign Data_Reg2_out = Data_Reg2;
+    assign Data_Segment_out = Data_Segment;
 
     //Banco de registros
     register_bank Registers(.clk(clk), .reset(reset), .RD_WR(RD_WR_Regs), .reg_write(Reg_Write), .Data(Data_Regs),

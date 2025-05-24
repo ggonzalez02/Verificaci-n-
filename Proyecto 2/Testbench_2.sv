@@ -55,6 +55,7 @@ module Interface_tb2;
     end
 
     class Scoreboard; 
+    // Registros 
         bit [15:0] banc_reg[8]; // 8 registros
         
         
@@ -67,6 +68,18 @@ module Interface_tb2;
             return (data_actual === banc_reg[indice]);
         endfunction
 
+    // Segmentos 
+        bit [15:0] seg_reg[4];// 4 segmentos 
+        // función escribe al segmento 
+        function void WR_seg(int indice,bit [15:0] data);
+            seg_reg[indice] = data;
+        endfunction
+        // función lee el segmento
+        function bit RD_seg(int indice,bit [15:0] data_actual);
+            return (data_actual === seg_reg[indice]);
+        endfunction
+
+
     endclass
 
 
@@ -77,7 +90,8 @@ module Interface_tb2;
         function new(virtual interface_8088 p_bfm);
             bfm = p_bfm;
         endfunction
-        
+
+        // Registros 
         task WR_reg(int indice, bit [15:0] data);
             bfm.RD_WR_Regs = 1;
             bfm.Reg_Write = indice;
@@ -96,6 +110,24 @@ module Interface_tb2;
             data_actual = bfm.Data_Reg1_out; // path del output de reg1 en top.v 
         endtask
 
+        // Segmentos 
+        task WR_seg(int indice, bit [15:0] data);
+            bfm.RD_WR_Segments = 1;
+            bfm.Segment = indice;
+            bfm.Data_Segments = data;
+            @(posedge bfm.clk);
+            @(posedge bfm.clk);
+            bfm.RD_WR_Segments = 0;
+            scb.WR_seg(indice, data);
+        endtask
+
+        task RD_seg(int indice, output bit [15:0] data);
+            bfm.RD_WR_Segments = 0;
+            bfm.Segment = indice;
+            @(posedge bfm.clk);
+            @(posedge bfm.clk);
+            data = bfm.Data_Segment_out;
+        endtask
     endclass
     
 
@@ -105,28 +137,45 @@ module Interface_tb2;
         bit [15:0] data;
    
 
-        // Create objects
+        
         scb = new();
         tester = new(bfm);
         tester.scb = scb;
         
-        // Initialize signals
+        
         bfm.reset_interface();
         
-        // Run tests
-        tester.WR_reg(0, 16'h1234);
-        tester.WR_reg(1, 16'h5678);
+        // Tests
+
+        //Regs
+        tester.WR_reg(0, 16'h1234); //AX
+        tester.WR_reg(1, 16'h5678); //BX
+
+        //Segs
+        tester.WR_seg(0, 16'h1000); // CS
+        tester.WR_seg(1, 16'h2000); // DS
+        tester.WR_seg(2, 16'h3000); // SS
+        tester.WR_seg(3, 16'h4000); // ES
         
-        // Verify
+        // Verificación 
         
         tester.RD_reg(0, data);
         if(scb.RD_reg(0, data)) 
             $display("PASS");
         else 
             $display("FAIL");
+
+         
+        tester.RD_seg(0, data);
+        if(scb.RD_seg(0, data)) 
+            $display("PASS");
+        else 
+            $display("FAIL");
         
         #50 $finish;
     end
+
+
 
 
 endmodule
