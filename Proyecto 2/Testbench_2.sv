@@ -17,49 +17,6 @@
 
 `include "interface.sv"
 
-class Scoreboard; 
-    bit [15:0] banc_reg[8]; // 8 registros
-    
-    
-    // función escribe al registro 
-    function void WR_reg(int indice,bit [15:0] data);
-        banc_reg[indice] = data;
-    endfunction
-    // función lee el registro
-    function bit RD_reg(int indice,bit [15:0] data_actual);
-        return (data_actual === banc_reg[indice]);
-    endfunction
-
-endclass
-
-
-class Tester; 
-    virtual interface_8088 bfm;
-    Scoreboard scb;
-
-    function new(virtual interface_8088 p_bfm);
-        bfm = p_bfm;
-    endfunction
-    
-    task WR_reg(int indice, bit [15:0] data);
-        bfm.RD_WR_Regs = 1;
-        bfm.Reg_Write = indice;
-        bfm.Data_Regs = data;
-        @(posedge bfm.clk);
-        @(posedge bfm.clk);
-        bfm.RD_WR_Regs = 0;
-        scb.WR_reg(indice, data);
-    endtask
-
-    task RD_reg (int indice, output bit [15:0] data_actual);
-        bfm.RD_WR_Regs = 0;
-        bfm.Reg1 = indice; 
-        @(posedge bfm.clk);
-        @(posedge bfm.clk);
-        data_actual = bfm.Data_Reg1_out; // path del output de reg1 en top.v 
-    endtask
-
-endclass
 module Interface_tb2;
     
     //Interfaz
@@ -80,17 +37,74 @@ module Interface_tb2;
         .Data_Segments(bfm.Data_Segments),
         .Reg_Write(bfm.Reg_Write),
         .Direction(bfm.Direction),
-        .Data(bfm.Data),
         .Data_Reg1_out(bfm.Data_Reg1_out),
-        .Data_Reg2_out(bfm.Data_Reg2_out)
+        .Data_Reg2_out(bfm.Data_Reg2_out),
+        .Relative(bfm.Relative),
+        .Segment(bfm.Segment),
+        .EN_IP(bfm.EN_IP),
+        .SEL_IP(bfm.SEL_IP),
+        .IP(bfm.IP),
+        .EN(bfm.EN),
+        .Internal_RD_WR(bfm.Internal_RD_WR),
+        .Instruction(bfm.Instruction)
     );
+    // Para el wave form en playground
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, Interface_tb2);
+    end
 
+    class Scoreboard; 
+        bit [15:0] banc_reg[8]; // 8 registros
+        
+        
+        // función escribe al registro 
+        function void WR_reg(int indice,bit [15:0] data);
+            banc_reg[indice] = data;
+        endfunction
+        // función lee el registro
+        function bit RD_reg(int indice,bit [15:0] data_actual);
+            return (data_actual === banc_reg[indice]);
+        endfunction
+
+    endclass
+
+
+    class Tester; 
+        virtual interface_8088 bfm;
+        Scoreboard scb;
+
+        function new(virtual interface_8088 p_bfm);
+            bfm = p_bfm;
+        endfunction
+        
+        task WR_reg(int indice, bit [15:0] data);
+            bfm.RD_WR_Regs = 1;
+            bfm.Reg_Write = indice;
+            bfm.Data_Regs = data;
+            @(posedge bfm.clk);
+            @(posedge bfm.clk);
+            bfm.RD_WR_Regs = 0;
+            scb.WR_reg(indice, data);
+        endtask
+
+        task RD_reg (int indice, output bit [15:0] data_actual);
+            bfm.RD_WR_Regs = 0;
+            bfm.Reg1 = indice; 
+            @(posedge bfm.clk);
+            @(posedge bfm.clk);
+            data_actual = bfm.Data_Reg1_out; // path del output de reg1 en top.v 
+        endtask
+
+    endclass
     
 
     initial begin
         Scoreboard scb;
         Tester tester;
-        
+        bit [15:0] data;
+   
+
         // Create objects
         scb = new();
         tester = new(bfm);
@@ -105,8 +119,8 @@ module Interface_tb2;
         
         // Verify
         
-        tester.RD_reg(0, bfm.Data);
-        if(scb.RD_reg(0, bfm.Data)) 
+        tester.RD_reg(0, data);
+        if(scb.RD_reg(0, data)) 
             $display("PASS");
         else 
             $display("FAIL");
@@ -116,4 +130,3 @@ module Interface_tb2;
 
 
 endmodule
-

@@ -32,7 +32,7 @@ module top (
 
 
     output [31:0] Instruction,      //Señal de instrucción resultante
-    output [19:0] Direction         //Señal de dirección resultante
+    output [19:0] Direction,         //Señal de dirección resultante
     output [15:0] Data_Reg1_out,
     output [15:0] Data_Reg2_out
 );
