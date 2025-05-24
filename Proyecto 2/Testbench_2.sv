@@ -48,8 +48,15 @@ module Interface_tb2;
         .Internal_RD_WR(bfm.Internal_RD_WR),
         .Instruction(bfm.Instruction)
     );
-    // Para el wave form en playground
+    
+    integer log_file; 
+
     initial begin
+        // Abrir archivo tipo log
+        log_file = $fopen("Testbench_1.log", "w");
+        $fdisplay(log_file, "Time | reset | OP | RD_WR_Regs | Reg_Write | EN_IP | Internal_RD_WR | Direction");
+
+        // Para el wave form en playground
         $dumpfile("dump.vcd");
         $dumpvars(0, Interface_tb2);
     end
@@ -175,6 +182,13 @@ module Interface_tb2;
         #50 $finish;
     end
 
+    initial begin
+        forever begin
+            #10;
+            $fdisplay(log_file, "%3dns | %b | %b | %b | %b | %b | %b | %h", 
+                 $time, reset, OP, RD_WR_Regs, Reg_Write, EN_IP, Internal_RD_WR, Direction);
+        end
+    end
 
 
 
