@@ -119,17 +119,8 @@ module Interface_tb2;
                 5: offset = banc_reg[reg1_indice] + banc_reg[reg2_indice] + relative;
             endcase
             
-            addr = (seg_reg[seg_indice] << 4) + offset;
-            return addr;
         endfunction
 
-        function bit [19:0] fix_address(bit [19:0] addr, int seg_idx);
-         
-             if (addr < 20'h10000) begin
-            return (seg_reg[seg_idx] << 4) + addr;
-            end
-        return addr;
-endfunction
 
     //Check list 
         //Registros
