@@ -143,14 +143,13 @@ module Interface_tb2;
 
         // IP
 
-        function bit check_ip_change(bit [19:0] old_dir, bit [19:0] new_dir);
-            bit [19:0] expected_diff = 1; // IP incremented by 1
-            if (new_dir == old_dir + expected_diff) begin
-                $display("SCOREBOARD: IP - PASS: Direction changed by 0x%X", expected_diff);
-                return 1;
+        function bit check_ip(bit [19:0] vieja, bit [19:0] nueva);
+            if (nueva == vieja + 1) begin
+                $display("SCOREBOARD: IP - PASS: Dirección cambió de 0x%05X a 0x%05X", vieja, nueva);
+            return 1;
             end else begin
-                $error("SCOREBOARD: IP - FAIL: Expected change of 0x%X", expected_diff);
-                return 0;
+            $error("SCOREBOARD: IP - FAIL: Esperado 0x%05X, obtuvo 0x%05X", vieja + 1, nueva);
+            return 0;
             end
         endfunction
         
@@ -306,11 +305,13 @@ module Interface_tb2;
 
         tester.suma_ip();  // Increment IP
         tester.test_alu(0, 0, 0, 0, 0);  // Mode 0 again
-      scb.check_ip_change(dir_antes, bfm.Direction);
+        scb.check_ip(dir_antes, bfm.Direction);
 
         //ALU
+        bfm.RD_WR_Segments = 0;
+        @(posedge bfm.clk);
 
-        // OP 1: Segment + Relative only
+        // OP 1: Segment + Relative 
         tester.test_alu(1, 1, 0, 0, 16'h0200);  // DS:0200h
         OP1_resul = bfm.Direction;
         $display("OP 1 (DS:0200h): 0x%05X", OP1_resul);
@@ -321,18 +322,18 @@ module Interface_tb2;
          base = bfm.Direction;
         $display("OP 2 (DS:AX): 0x%05X", base);
 
-        // Mode 3: DS:AX+0x100
+        // OP 3: DS:AX+0x100
         tester.test_alu(3, 1, 0, 0, 16'h0100);  
-        scb.check_alu(3, bfm.Direction, (base & 16'hFFFF) + 16'h0100);
+        scb.check_alu(3, bfm.Direction, base + 16'h0100);  
 
 
         // OP 4: DS:AX+BX
         tester.test_alu(4, 1, 0, 1, 0);  
-        scb.check_alu(4, bfm.Direction, (base & 16'hFFFF) + 16'h5678);
+        scb.check_alu(4, bfm.Direction, base + 16'h5678);
 
         // OP 5: DS:AX+BX+Relative
-        tester.test_alu(5, 1, 0, 1, 16'h0100);  // DS:AX+BX+0100h
-        scb.check_alu(5, bfm.Direction, (base & 16'hFFFF) + 16'h5678 + 16'h0100);
+        tester.test_alu(5, 1, 0, 1, 16'h0100); 
+        scb.check_alu(5, bfm.Direction, base + 16'h5678 + 16'h0100);
         
         // OP 0: CS:IP
         tester.test_alu(0, 0, 0, 0, 0);  

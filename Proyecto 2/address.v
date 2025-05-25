@@ -17,6 +17,6 @@ module address (
 );
 
 // shift hacia la izquierda más suma del segmento
-assign address = {segmento << 4} + offset;
+assign address = (segmento << 4) + offset;
 
 endmodule 
