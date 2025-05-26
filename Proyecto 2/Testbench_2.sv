@@ -51,6 +51,7 @@ module Interface_tb2;
         .Instruction(bfm.Instruction),
         .Data_Segment_out(bfm.Data_Segment_out),
         .RD_WR(bfm.RD_WR_pin),
+        .Bus(bfm.Bus),
         .Data(bfm.Data_pin)
     );
     
@@ -98,6 +99,17 @@ module Interface_tb2;
         ip_reg++;
         endfunction
 
+    // Queue 
+        bit [7:0] Input_to_queue [4]; 
+        int queue_pointer = 0; // apunta al siguiente espacio que se va escribir 
+
+        function void WR_queue_input(bit [7:0] data);
+            if (queue_pointer < 4) begin
+                Input_to_queue [queue_pointer] = data;
+                queue_pointer++;
+            end
+        endfunction
+
 
 
     //Check list 
@@ -139,6 +151,18 @@ module Interface_tb2;
             $error("SCOREBOARD: ALU OP[[%0d] - FAIL: esperado 0x%05X, got 0x%05X", mode, esperado, data_actual);
             return 0;
          end
+        endfunction
+
+        // Queue
+        function bit check_queue(bit [31:0] actual);
+            bit [31:0] esperado = {Input_to_queue [0], Input_to_queue [1], Input_to_queue [2], Input_to_queue [3]};
+            if (actual === esperado) begin
+                $display("SCOREBOARD: QUEUE - PASS: 0x%08X", actual);
+                return 1;
+            end else begin
+                $error("SCOREBOARD: QUEUE - FAIL: Esperado 0x%08X, se tiene 0x%08X", esperado, actual);
+                return 0;
+            end
         endfunction
 
     endclass
@@ -221,6 +245,19 @@ module Interface_tb2;
             @(posedge bfm.clk);
             @(posedge bfm.clk);
         endtask
+
+        // Queue
+        task Input_to_queue(bit [7:0] data);
+            bfm.Internal_RD_WR = 0;  
+            bfm.RD_WR_drive = 0; 
+            bfm.EN = 1;
+            bfm.Bus = data;
+            @(posedge bfm.clk);
+            @(posedge bfm.clk);
+            bfm.EN = 0;
+            scb.WR_queue_input(data);
+        endtask
+
     endclass
     
 
@@ -241,9 +278,9 @@ module Interface_tb2;
         
         bfm.reset_interface();
         
-        // Tests
+// Tests
 
-        //Regs
+    //Regs
         tester.WR_reg(0, 16'h1234); //AX
         tester.WR_reg(1, 16'h5678); //BX
         tester.WR_reg(2, 16'h8683); //CX
@@ -261,7 +298,7 @@ module Interface_tb2;
         tester.RD_reg(5, data);
         tester.RD_reg(6, data);
         tester.RD_reg(7, data);
-        //Segs
+    //Segs
         tester.WR_seg(0, 16'h1000); // CS
         tester.WR_seg(1, 16'h2000); // DS
         tester.WR_seg(2, 16'h3000); // SS
@@ -272,7 +309,7 @@ module Interface_tb2;
         tester.RD_seg(2, data);
         tester.RD_seg(3, data);
 
-        // IP 
+    // IP 
         tester.WR_ip(8'h50);
         tester.test_alu(0, 0, 0, 0, 0); 
       	dir_antes = bfm.Direction;
@@ -283,10 +320,8 @@ module Interface_tb2;
         tester.test_alu(0, 0, 0, 0, 0); 
         scb.check_ip(dir_antes, bfm.Direction);
 
-        //ALU
+    //ALU
         bfm.RD_WR_Segments = 0;
-
-
         // OP 1
         //Orden: OP, seg, reg1, reg2, relative
         tester.test_alu(1, 1, 0, 0, 16'h0200);  
@@ -316,6 +351,18 @@ module Interface_tb2;
         tester.test_alu(0, 0, 0, 0, 0);  
         scb.check_alu(0, bfm.Direction, 20'h10051);
         
+    //Queue
+        tester.Input_to_queue(8'hAA);
+        @(posedge bfm.clk);
+        tester.Input_to_queue(8'hBB);
+        @(posedge bfm.clk);
+        tester.Input_to_queue(8'hCC);
+        @(posedge bfm.clk);
+        tester.Input_to_queue(8'hDD);
+        @(posedge bfm.clk);
+        scb.check_queue(bfm.Instruction);
+
+       
         #50 $finish;
     end
 

@@ -16,7 +16,7 @@ interface interface_8088;
     logic [2:0] Reg2;
     wire RD_WR_pin;            //Señal direccional para el DUT
     logic RD_WR_drive;          //Señal local 
-  wire [7:0] Data_pin;      //Señal direccional para el DUT
+    wire [7:0] Data_pin;      //Señal direccional para el DUT
     logic [15:0] Data_drive;    //Señal local
     logic [19:0] Direction;
 
