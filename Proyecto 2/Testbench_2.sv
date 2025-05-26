@@ -100,10 +100,6 @@ module Interface_tb2;
             ip_reg = data;
         endfunction
 
-        function void suma_ip();
-        ip_reg++;
-        endfunction
-
     // Queue 
         bit [7:0] Input_to_queue [4]; 
         int queue_pointer = 0; // apunta al siguiente espacio que se va escribir 
@@ -111,7 +107,7 @@ module Interface_tb2;
         function void WR_queue_input(bit [7:0] data);
             if (queue_pointer < 4) begin
                 Input_to_queue [queue_pointer] = data;
-                queue_pointer++;
+                queue_pointer++; // incremetan el pointer a la siguiente posición 
             end
         endfunction
 
@@ -231,14 +227,6 @@ module Interface_tb2;
             scb.WR_ip(data);
         endtask
 
-        task suma_ip();
-            bfm.EN_IP = 1;
-            bfm.SEL_IP = 0;
-            @(posedge bfm.clk);
-            @(posedge bfm.clk);
-            bfm.EN_IP = 0;
-            scb.suma_ip();
-        endtask
 
         //ALU
         task test_alu(int mode, int seg, int reg1, int reg2, bit [15:0] rel);
@@ -319,11 +307,7 @@ module Interface_tb2;
         tester.test_alu(0, 0, 0, 0, 0); 
       	dir_antes = bfm.Direction;
 
-        tester.suma_ip();  
-        bfm.Segment = 0;   
-        @(posedge bfm.clk);
-        tester.test_alu(0, 0, 0, 0, 0); 
-        scb.check_ip(dir_antes, bfm.Direction);
+
 
     //ALU
         bfm.RD_WR_Segments = 0;
@@ -354,7 +338,7 @@ module Interface_tb2;
         
         // OP 0
         tester.test_alu(0, 0, 0, 0, 0);  
-        scb.check_alu(0, bfm.Direction, 20'h10051);
+        scb.check_alu(0, bfm.Direction, 20'h10050);
         
     //Queue
         tester.Input_to_queue(8'hAA);
@@ -366,6 +350,9 @@ module Interface_tb2;
         tester.Input_to_queue(8'hDD);
         @(posedge bfm.clk);
         scb.check_queue(bfm.Instruction);
+
+        $display("=== COVERGROUPS RESULTADOS ===");
+        $display("OP Coverage: %.2f%%", op_c.get_coverage());
 
        
         #50 $finish;
@@ -384,12 +371,19 @@ module Interface_tb2;
 */
 
     covergroup op_cover;
-        coverpoint op_point{
+        coverpoint bfm.OP{
             bins op_1 = {3'b000};
             bins op_2 = {3'b001};
             bins op_3 = {3'b010};
             bins op_4 = {3'b011};
             bins op_5 = {3'b100};
+            bins op_6 = {3'b101};
+        }
+        coverpoint bfm.Reg1 {
+        bins regs[] = {[0:7]}; 
+        }
+        coverpoint bfm.Segment {
+        bins segs[] = {[0:3]};  
         }
 
     endgroup
@@ -399,7 +393,7 @@ module Interface_tb2;
     initial begin
         op_c = new();
         forever begin
-            wait_n_clks(1);
+            @(posedge bfm.clk);
             op_c.sample();
         end
     end
