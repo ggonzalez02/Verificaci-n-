@@ -58,7 +58,7 @@ module Interface_tb2;
 
     //Función para esperar n veces el flanco de subida del clock
     task automatic wait_n_clks(input int n);
-        repeat(n) @(posedge clk);
+        repeat(n) @(posedge bfm.clk);
     endtask
 
     initial begin
