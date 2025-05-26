@@ -57,11 +57,6 @@ module Interface_tb2;
     integer log_file; 
 
     initial begin
-        // Abrir archivo tipo log
-      /*
-        log_file = $fopen("Testbench_1.log", "w");
-        $fdisplay(log_file, "Time | reset | OP | RD_WR_Regs | Reg_Write | EN_IP | Internal_RD_WR | Direction");
-       */
 
         // Para el wave form en playground
         $dumpfile("dump.vcd");
@@ -104,23 +99,6 @@ module Interface_tb2;
         endfunction
 
 
-    //ALU
-        function bit [19:0] calculate_address(int mode, int seg_indice, int reg1_indice, int reg2_indice, bit [15:0] relative);
-            bit [15:0] offset;
-            bit [19:0] addr;
-            
-            // Operaciones escogidas 
-            case(mode)
-                0: offset = {8'h00, ip_reg};  
-                1: offset = relative;
-                2: offset = banc_reg[reg1_indice];
-                3: offset = banc_reg[reg1_indice] + relative;
-                4: offset = banc_reg[reg1_indice] + banc_reg[reg2_indice];
-                5: offset = banc_reg[reg1_indice] + banc_reg[reg2_indice] + relative;
-            endcase
-            
-        endfunction
-
 
     //Check list 
         //Registros
@@ -142,7 +120,6 @@ module Interface_tb2;
         endfunction
 
         // IP
-
         function bit check_ip(bit [19:0] vieja, bit [19:0] nueva);
             if (nueva == vieja + 1) begin
                 $display("SCOREBOARD: IP - PASS: Dirección cambió de 0x%05X a 0x%05X", vieja, nueva);
@@ -207,7 +184,6 @@ module Interface_tb2;
         endtask
 
         task RD_seg(int indice, output bit [15:0] data);
-            bfm.RD_WR_Segments = 0;
             bfm.Segment = indice;
             @(posedge bfm.clk);
             @(posedge bfm.clk);
@@ -252,8 +228,6 @@ module Interface_tb2;
         Scoreboard scb;
         Tester tester;
         bit [15:0] data;
-        bit [19:0] result_mode2;
-        bit [19:0] result_mode4;
      	bit [19:0] dir_antes;
         bit [19:0] OP1_resul;
         bit [19:0] base;
@@ -300,57 +274,50 @@ module Interface_tb2;
 
         // IP 
         tester.WR_ip(8'h50);
-        tester.test_alu(0, 0, 0, 0, 0);  // Mode 0: CS:IP
+        tester.test_alu(0, 0, 0, 0, 0); 
       	dir_antes = bfm.Direction;
 
-        tester.suma_ip();  // Increment IP
-        tester.test_alu(0, 0, 0, 0, 0);  // Mode 0 again
+        tester.suma_ip();  
+        bfm.Segment = 0;   
+        @(posedge bfm.clk);
+        tester.test_alu(0, 0, 0, 0, 0); 
         scb.check_ip(dir_antes, bfm.Direction);
 
         //ALU
         bfm.RD_WR_Segments = 0;
-        @(posedge bfm.clk);
 
-        // OP 1: Segment + Relative 
-        tester.test_alu(1, 1, 0, 0, 16'h0200);  // DS:0200h
+
+        // OP 1
+        //Orden: OP, seg, reg1, reg2, relative
+        tester.test_alu(1, 1, 0, 0, 16'h0200);  
         OP1_resul = bfm.Direction;
-        $display("OP 1 (DS:0200h): 0x%05X", OP1_resul);
+        scb.check_alu(1, bfm.Direction, 20'h20200);
 
 
-        // OP 2: DS:AX
+        // OP 2
         tester.test_alu(2, 1, 0, 0, 0);  
-         base = bfm.Direction;
-        $display("OP 2 (DS:AX): 0x%05X", base);
+        base = bfm.Direction;
+        scb.check_alu(2, bfm.Direction, 20'h21234);
 
-        // OP 3: DS:AX+0x100
+        // OP 3
         tester.test_alu(3, 1, 0, 0, 16'h0100);  
         scb.check_alu(3, bfm.Direction, base + 16'h0100);  
 
 
-        // OP 4: DS:AX+BX
+        // OP 4
         tester.test_alu(4, 1, 0, 1, 0);  
         scb.check_alu(4, bfm.Direction, base + 16'h5678);
 
-        // OP 5: DS:AX+BX+Relative
+        // OP 5
         tester.test_alu(5, 1, 0, 1, 16'h0100); 
         scb.check_alu(5, bfm.Direction, base + 16'h5678 + 16'h0100);
         
-        // OP 0: CS:IP
+        // OP 0
         tester.test_alu(0, 0, 0, 0, 0);  
-        $display("OP 0 (CS:IP): 0x%05X", bfm.Direction);
+        scb.check_alu(0, bfm.Direction, 20'h10051);
         
         #50 $finish;
     end
-/*
-    initial begin
-        forever begin
-            #10;
-            $fdisplay(log_file, "%3dns | %b | %b | %b | %b | %b | %b | %h", 
-                 $time, reset, OP, RD_WR_Regs, Reg_Write, EN_IP, Internal_RD_WR, Direction);
-        end
-    end
-
-*/
 
 endmodule
 

@@ -24,7 +24,7 @@ module ALU (
     wire [19:0] address;
 
     //A partir de OP, decidir el tipo de direccionamiento que se va a obtener
-    always @(OP) begin
+    always @(*) begin
         case (OP)
             3'h0: begin
                 segmento = Data_Segment;
