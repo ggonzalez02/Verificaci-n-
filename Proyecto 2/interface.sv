@@ -56,7 +56,7 @@ interface interface_8088;
         forever #5 clk = ~clk; 
     end
     
-    //Funci�n para esperar n veces el flanco de subida del clock
+    //Función para esperar n veces el flanco de subida del clock
     task automatic wait_n_clks(input int n);
         repeat(n) @(posedge clk);
     endtask
