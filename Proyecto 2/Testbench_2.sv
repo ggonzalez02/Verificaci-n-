@@ -57,6 +57,11 @@ module Interface_tb2;
     
     integer log_file; 
 
+    //Función para esperar n veces el flanco de subida del clock
+    task automatic wait_n_clks(input int n);
+        repeat(n) @(posedge bfm.clk);
+    endtask
+
     initial begin
 
         // Para el wave form en playground
@@ -364,6 +369,39 @@ module Interface_tb2;
 
        
         #50 $finish;
+    end
+
+    //Covergroups
+
+/*
+    bins
+    Acorde al valor de OP
+    000: Segment * 10H + IP
+    001: Segment * 10H + Reg1
+    010: Segment * 10H + Reg1 + Relative
+    011: Segment * 10H + Reg1 + Reg2
+    100: Segment * 10H + Reg1 + Reg2 + Relative
+*/
+
+    covergroup op_cover;
+        coverpoint op_point{
+            bins op_1 = {3'b000};
+            bins op_2 = {3'b001};
+            bins op_3 = {3'b010};
+            bins op_4 = {3'b011};
+            bins op_5 = {3'b100};
+        }
+
+    endgroup
+
+    op_cover op_c;
+
+    initial begin
+        op_c = new();
+        forever begin
+            wait_n_clks(1);
+            op_c.sample();
+        end
     end
 
 endmodule
