@@ -17,6 +17,6 @@ module address (
 
 assign signoA = float_numA[31];
 assign exponenteA = float_numA[30:23];
-assign mantissaA = { 1'b1, float_numA[22:0]};
+assign mantissaA = { 1'b1, float_numA[22:0]}; // Se agrega un 1 al inicio para la normalización implícita (1.xxx)
 
 endmodule 
