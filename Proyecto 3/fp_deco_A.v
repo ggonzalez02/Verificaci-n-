@@ -8,7 +8,7 @@
 // Description: Este módulo se encarga de dividir un número de 32 bits de punto flotante en signo, exponente y mantissa.
 //////////////////////////////////////////////////////////////////////////////////
 
-module address (
+module fp_decoA (
     input  [31:0] float_numA,
     output signoA,
     output [7:0] exponenteA,
