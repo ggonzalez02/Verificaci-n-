@@ -14,6 +14,6 @@ module exp_adder (
     output [8:0] Exp_resul
 );
 
-assign exp_result = exponenteA + exponenteB;
+assign Exp_resul = Exponente_A + Exponente_B;
 
 endmodule 

@@ -14,6 +14,6 @@ module xor_signo (
     output Signo
 );
 
-assign signo = signoA ^ signoB ;
+assign Signo = Signo_A ^ Signo_B ;
 
 endmodule 

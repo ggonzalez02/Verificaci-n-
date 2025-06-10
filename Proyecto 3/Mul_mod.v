@@ -4,4 +4,5 @@ module Mul_mod (
     output [47:0] Producto
 );
 
+assign Producto = Mantissa_A * Mantissa_B; 
 endmodule

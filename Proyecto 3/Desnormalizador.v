@@ -7,5 +7,9 @@ module Desnormalizador (
     output [7:0]  Exp_comun,
     output [23:0] Resul_Mantissa_B
 );
+// Alinear Mantissa 
+
+// Sacar resultado de exponente comun si ambos exponentes son diferentes 
+
 
 endmodule
