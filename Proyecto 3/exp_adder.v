@@ -9,9 +9,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module exp_adder (
-    input  [7:0] exponenteA,
-    input [7:0] exponenteB,
-    output [8:0] exp_result
+    input  [7:0] Exponente_A,
+    input  [7:0] Exponente_B,
+    output [8:0] Exp_resul
 );
 
 assign exp_result = exponenteA + exponenteB;

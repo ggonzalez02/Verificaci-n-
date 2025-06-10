@@ -9,9 +9,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module xor_signo (
-    input  signoA,
-    input signoB,
-    output signo
+    input  Signo_A,
+    input  Signo_B,
+    output Signo
 );
 
 assign signo = signoA ^ signoB ;

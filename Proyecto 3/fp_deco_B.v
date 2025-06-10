@@ -9,14 +9,14 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module fp_decoB (
-    input  [31:0] float_numB,
-    output signoB,
-    output [7:0] exponenteB,
-    output [23:0] mantissaB
+    input  [31:0] Float_num_B,
+    output Signo_B,
+    output [7:0] Exponente_B,
+    output [23:0] Mantissa_B
 );
 
-assign signoB = float_numB[31];
-assign exponenteB = float_numB[30:23];
-assign mantissaB = { 1'b1, float_numB[22:0]}; // Se agrega un 1 al inicio para la normalización implícita (1.xxx)
+assign Signo_B = Float_num_B[31];
+assign Exponente_B = Float_num_B[30:23];
+assign Mantissa_B = { 1'b1, Float_num_B[22:0]}; // Se agrega un 1 al inicio para la normalización implícita (1.xxx)
 
 endmodule 
