@@ -14,6 +14,9 @@ module exp_adder (
     output [8:0] Exp_resul
 );
 
+wire signed [8:0] exp_real_A = $signed({1'b0, Exponente_A}) - 9'd127;
+wire signed [8:0] exp_real_B = $signed({1'b0, Exponente_B}) - 9'd127;
+
 assign Exp_resul = Exponente_A + Exponente_B;
 
 endmodule 
