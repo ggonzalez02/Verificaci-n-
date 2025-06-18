@@ -15,6 +15,7 @@ module fp_decoB (
     output [23:0] Mantissa_B
 );
 
+// Se divide el número de 32 bits en tres partes para ejecutar las operaciones
 assign Signo_B = Float_num_B[31];
 assign Exponente_B = Float_num_B[30:23];
 assign Mantissa_B = { 1'b1, Float_num_B[22:0]}; // Se agrega un 1 al inicio para la normalización implícita (1.xxx)
