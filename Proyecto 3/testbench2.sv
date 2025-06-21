@@ -10,8 +10,6 @@
 
 `timescale 1ns/1ps
 
-`include "interface.sv"
-
 module testbench2;
     
     //Interfaz
@@ -77,14 +75,11 @@ module testbench2;
         endfunction
 
         //Verificar lectura de la operacion y el resultado
-        function void revisar(op, resultado);
+        function void revisar(input op, input [31:0] resultado);
         //Verificar la operacion
         if (op == 0) begin
             if (operacion_esperada != op)
-                $error("FALLO: Suma: %0h, Esperado: %0h, Obtenido: %0h", expected_data, data_pin);
-        end
-        else begin
-            if (operacion_esperada != op);
+                $error("FALLO: Suma, Esperado: %0b, Obtenido: %0b", operacion_esperada, op);
         end
         //Verificar el resultado
         if (resultado_esperado != resultado)
@@ -114,7 +109,7 @@ module testbench2;
     //Pruebas
     initial begin
         //Uso de las clases
-        ScoreBoard scoreboard;
+        Scoreboard scoreboard;
         Tester tester;
 
         scoreboard = new();
@@ -129,20 +124,31 @@ module testbench2;
             float_num_A_actual = numero_flotante_aleatorio();
             float_num_B_actual = numero_flotante_aleatorio();
             tester.entradas(op_actual, float_num_A_actual, float_num_B_actual);
-            scoreboard.scoreboard_guardar();
+            scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
             #100;
+            calculo = bfm.Resultado;
+            #50;
+            scoreboard.revisar(op_actual, calculo);
         end
 
+        //Resultados de los covergroups
+        $display("=== COVERGROUPS RESULTADOS ===");
+        $display("OP Coverage: %.2f%%", op_c.get_coverage());
+
+        //Cerrar archivo tipo log
+        $fclose(log_file);
+
+        #50 $finish;
     end
 
     // Monitoreo de señales
     initial begin
         $monitor("Time: %3dns | Float_num_A: %b | Float_num_B: %b | OP_input: %b | Resultado: %b",
-                 $time, Float_num_A, Float_num_B, OP_input, Resultado);
+                 $time, bfm.Float_num_A, bfm.Float_num_B, bfm.OP_input, bfm.Resultado);
         forever begin
             #10;
             $fdisplay(log_file, "%3dns | %b | %b | %b | %b", 
-                 $time, Float_num_A, Float_num_B, OP_input, Resultado);
+                 $time, bfm.Float_num_A, bfm.Float_num_B, bfm.OP_input, bfm.Resultado);
         end
     end
     
@@ -161,11 +167,11 @@ module testbench2;
     1: Negativo,    0: Positivo
 
     Acorde a los exponentes
-    Float A             Float B
-    Exponente grande,   Exponente grande
-    Exponente pequeño,  Exponente pequeño
-    Exponente grande,   Exponente pequeño
-    Exponente pequeño,  Exponente pequeño
+    Float A                 Float B
+    Exponente mayor a 127,  Exponente mayor a 127
+    Exponente menor a 127,  Exponente menor a 127
+    Exponente mayor a 127,  Exponente menor a 127
+    Exponente menor a 127,  Exponente menor a 127
 
     Acorde a los mantisas
     Float A             Float B
@@ -178,14 +184,12 @@ module testbench2;
     Mantisa pequeña,    Mantisa grande
 
     Acorde al orden de las operaciones
-    Sumar -> Sumar
-    Multiplicar -> Multiplicar
     Sumar -> Multiplicar
     Multiplicar -> Sumar
     */
     
     covergroup op_cover;
-        coverpoint bfm.OP{
+        coverpoint bfm.OP_input{
             bins op_1 = {1'b0};
             bins op_2 = {1'b1};
             bins op_suma_mult = (1'b0 => 1'b1);
@@ -209,7 +213,7 @@ module testbench2;
         op_c = new();
         forever begin
             op_c.sample();
-            #100;
+            #50;
         end
     end
 

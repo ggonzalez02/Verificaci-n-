@@ -35,7 +35,7 @@ wire [25:0] mantissa_A_ext = {Mantissa_A, 2'b00};
 wire [25:0] mantissa_B_ext = {Mantissa_B, 2'b00};
 
 // Asignar el resultado de la mantissa según el exponente mayor
-assign Resul_Mantissa_A = (exp_real_A >= exp_real_B) ? mantissa_A_extended : (mantissa_A_extended >> resta_exponentes);
-assign Resul_Mantissa_B = (exp_real_A >= exp_real_B) ? (mantissa_B_extended >> resta_exponentes) : mantissa_B_extended;
+assign Resul_Mantissa_A = (exp_real_A >= exp_real_B) ? mantissa_A_ext : (mantissa_A_ext >> resta_exponentes);
+assign Resul_Mantissa_B = (exp_real_A >= exp_real_B) ? (mantissa_B_ext >> resta_exponentes) : mantissa_B_ext;
 
 endmodule

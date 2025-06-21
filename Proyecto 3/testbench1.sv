@@ -98,7 +98,7 @@ module testbench1;
         Resultado ideal (40.81505)
         0 10000100 01000110100001010011100
         Resultado simulacion
-        0 11111111 00000000000000000000000
+        0 10000100 01000110100001010011100
         */
 
         //Hacer una multiplicación de números negativos
@@ -111,7 +111,7 @@ module testbench1;
         Resultado ideal (40.81505)
         0 10000100 01000110100001010011100
         Resultado simulacion
-        0 11111111 00000000000000000000000
+        v
         */
 
         //Hacer una multiplicación de números con distintos signo
@@ -121,10 +121,10 @@ module testbench1;
         #200;
 
         /*
-        Resultado ideal (40.81505)
+        Resultado ideal (-40.81505)
         1 10000100 01000110100001010011100
         Resultado simulacion
-        1 11111111 00000000000000000000000
+        1 10000100 01000110100001010011100
         */
 
         //Hacer una división
@@ -137,7 +137,7 @@ module testbench1;
         Resultado ideal (2.725)
         0 10000000 01011100110011001100110
         Resultado simulacion
-        0 11111111 00000000000000000000000
+        0 10000000 01011100110011001100110
         */
 
         //Cerrar archivo tipo log
