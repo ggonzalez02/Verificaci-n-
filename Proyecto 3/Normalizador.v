@@ -121,6 +121,7 @@ always @(*) begin
         if (Suma_resul == 0) begin
             exponente_final = 8'b0;
             mantissa_final = 23'b0;
+            signo_final = 1'b0; 
         end
         else begin
             exp_temp = $signed({2'b00, Exp_comun}); 
@@ -141,49 +142,46 @@ always @(*) begin
             else begin // Detectar underflow (hay que hacer shift a la izquierda)
                 cont_zeros = 0;
                 shifted_sum = Suma_resul;
-                // Revisar por partes para encontrar el bit más significativo
-                if (shifted_sum[24:20] == 5'b0) begin 
-                    cont_zeros = cont_zeros + 5; shifted_sum = shifted_sum << 5; 
-                    end
-                if (shifted_sum[25:23] == 3'b0) begin 
-                    cont_zeros = cont_zeros + 3; shifted_sum = shifted_sum << 3; 
-                    end
-                if (shifted_sum[25:24] == 2'b0) begin 
-                    cont_zeros = cont_zeros + 2; shifted_sum = shifted_sum << 2; 
-                    end
-                if (shifted_sum[25] == 1'b0) begin 
-                    cont_zeros = cont_zeros + 1; shifted_sum = shifted_sum << 1; 
-                    end
                 
+                // Buscar el bit 1 más significativo por medio de un while para recorrer toda la suma
+                while (shifted_sum != 0 && shifted_sum[25] == 1'b0 && cont_zeros < 26) begin
+                    shifted_sum = shifted_sum << 1;
+                    cont_zeros = cont_zeros + 1;
+                end
+
                 mantissa_red = {1'b1, shifted_sum[24:2]};
                 guard_bit = shifted_sum[1];
                 round_bit = shifted_sum[0];
                 sticky_bit = 1'b0; 
-                exp_temp = exp_temp - cont_zeros; // Se restan la cantidad de ceros por la cantidad de shifts que se hicieron
+                exp_temp = exp_temp - cont_zeros;
             end
             
-            // Redondeo
-            if (guard_bit && (round_bit || sticky_bit || mantissa_red[0])) begin
-                mantissa_red = mantissa_red + 1;
-                
-                // Se revisa si hay overflow en la mantissa redondeada
-                if (mantissa_red[24]) begin
-                    mantissa_red = 24'h800000; // Si hay overflow se normaliza
-                    exp_temp = exp_temp + 1;
+            // Solo procesar redondeo y asignación final si no es cero
+            if (!(exponente_final == 8'b0 && mantissa_final == 23'b0)) begin
+                // Redondeo
+                if (guard_bit && (round_bit || sticky_bit || mantissa_red[0])) begin
+                    mantissa_red = mantissa_red + 1;
+                    
+                    // Se revisa si hay overflow en la mantissa redondeada
+                    if (mantissa_red[24]) begin
+                        mantissa_red = 24'h800000; // Si hay overflow se normaliza
+                        exp_temp = exp_temp + 1;
+                    end
                 end
-            end
-            
-            if (exp_temp <= 10'd0) begin // Si el exponente es mayor que 255 se establece como 11111111 y la mantisa en 0000...
-                exponente_final = 8'b0;
-                mantissa_final = 23'b0;
-            end
-            else if (exp_temp >= 10'd255) begin // Si el exponente es menor que 255 se establece como 00000000 y la mantisa en 0000...
-                exponente_final = 8'hFF;
-                mantissa_final = 23'b0;
-            end
-            else begin
-                exponente_final = exp_temp[7:0]; // Si el exponente está en un rango válido se convierte a 8 bits
-                mantissa_final = mantissa_red[22:0]; // Se quita el bit implícito para tener una mantissa de 23 bits
+                
+                if (exp_temp <= 10'd0) begin // Si el exponente es menor o igual a 0
+                    exponente_final = 8'b0;
+                    mantissa_final = 23'b0;
+                    signo_final = 1'b0; // Underflow a +0
+                end
+                else if (exp_temp >= 10'd255) begin // Si el exponente es mayor o igual a 255
+                    exponente_final = 8'hFF;
+                    mantissa_final = 23'b0; // Overflow a infinito
+                end
+                else begin
+                    exponente_final = exp_temp[7:0]; // Si el exponente está en un rango válido se convierte a 8 bits
+                    mantissa_final = mantissa_red[22:0]; // Se quita el bit implícito para tener una mantissa de 23 bits
+                end
             end
         end
     end
