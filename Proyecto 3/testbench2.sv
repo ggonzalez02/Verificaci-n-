@@ -16,10 +16,10 @@ module testbench2;
     interfaz bfm();
 
     //Señales para hacer pruebas
-    logic op_actual;
-    logic [31:0] float_num_A_actual;
-    logic [31:0] float_num_B_actual;
-    logic [31:0] calculo;
+    bit op_actual;
+    shortreal float_num_A_actual;
+    shortreal float_num_B_actual;
+    shortreal calculo;
 
     //Instancia del DUT
     top DUT(
@@ -39,23 +39,23 @@ module testbench2;
     end
 
     //Obtener operacion aleatoria (suma o multiplicación)
-    function logic operacion_aleatoria();
-        logic op_aleatoria;
-        op_aleatoria = $random;
+    function bit operacion_aleatoria();
+        bit op_aleatoria;
+        op_aleatoria = $urandom;
         return op_aleatoria;
     endfunction
 
     //Obtener número aleatorio flotante
-    function logic [31:0] numero_flotante_aleatorio();
-        logic [31:0] num_flotante;
-        num_flotante = $random;
+    function shortreal numero_flotante_aleatorio();
+        shortreal num_flotante;
+        num_flotante = $urandom_range(-2896,2896);
         return num_flotante;
     endfunction
 
     //Scoreboard
     class Scoreboard;
         //Datos internos
-        logic operacion_esperada;
+        bit operacion_esperada;
         shortreal A, B;
         shortreal resultado_esperado;
 
@@ -80,6 +80,10 @@ module testbench2;
         if (op == 0) begin
             if (operacion_esperada != op)
                 $error("FALLO: Suma, Esperado: %0b, Obtenido: %0b", operacion_esperada, op);
+        else begin
+            if (operacion_esperada != op)
+                $error("FALLO: Multiplicación, Esperado: %0b, Obtenido: %0b", operacion_esperada, op);
+        end
         end
         //Verificar el resultado
         if (resultado_esperado != resultado)
@@ -122,13 +126,15 @@ module testbench2;
         for (int i = 0; i < 10; i++) begin
             op_actual = operacion_aleatoria();
             float_num_A_actual = numero_flotante_aleatorio();
+            float_num_A_actual = $realtobits(float_num_A_actual);
             float_num_B_actual = numero_flotante_aleatorio();
+            float_num_B_actual = $realtobits(float_num_B_actual);
             tester.entradas(op_actual, float_num_A_actual, float_num_B_actual);
             scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
-            #100;
             calculo = bfm.Resultado;
             #50;
             scoreboard.revisar(op_actual, calculo);
+            #50;
         end
 
         //Resultados de los covergroups
@@ -160,28 +166,28 @@ module testbench2;
     1: Multiplicar
 
     Acorde al signo de los operadores
-    Signo A         Signo B
-    0: Positivo,    0: Positivo
-    1: Negativo,    1: Negativo
-    0: Positivo,    1: Negativo
-    1: Negativo,    0: Positivo
+    Signo A
+    0: Positivo
+    1: Negativo
+    Signo B
+    0: Positivo
+    1: Negativo
 
     Acorde a los exponentes
-    Float A                 Float B
-    Exponente mayor a 127,  Exponente mayor a 127
-    Exponente menor a 127,  Exponente menor a 127
-    Exponente mayor a 127,  Exponente menor a 127
-    Exponente menor a 127,  Exponente menor a 127
+    Float A
+    Exponente mayor o igual a 127
+    Exponente menor a 127
+    Float B
+    Exponente mayor o igual a 127
+    Exponente menor a 127
 
     Acorde a los mantisas
-    Float A             Float B
-    Mantisa 0,          Mantisa 0
-    Mantisa 0,          Mantisa no 0
-    Mantisa no 0,       Mantisa 0
-    Mantisa grande,     Mantisa grande
-    Mantisa pequeña,    Mantisa pequeña
-    Mantisa grande,     Mantisa pequeña
-    Mantisa pequeña,    Mantisa grande
+    Float A
+    Mantisa 0
+    Mantisa no 0
+    Float B
+    Mantisa 0
+    Mantisa no 0
 
     Acorde al orden de las operaciones
     Sumar -> Multiplicar
@@ -189,21 +195,50 @@ module testbench2;
     */
     
     covergroup op_cover;
+        //Sumas, multiplicaciones y transiciones entre ellas
         coverpoint bfm.OP_input{
             bins op_1 = {1'b0};
             bins op_2 = {1'b1};
             bins op_suma_mult = (1'b0 => 1'b1);
             bins op_mult_suma = (1'b1 => 1'b0);
         }
+        //Valor de A como cero
         coverpoint bfm.Float_num_A{
             bins num_0 = {32'b00000000000000000000000000000000};
-            bins num_positivo = {32'b0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX};
-            bins num_negativo = {32'b1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX};
         }
+        //Signo de A
+        coverpoint bfm.Float_num_A [31]{
+            bins num_positivo = {1'b0};
+            bins num_negativo = {1'b1};
+        }
+        //Exponente de A
+        coverpoint bfm.Float_num_A [30:23]{
+            bins mayor_a_127 = {[127:255]};
+            bins menor_a_127 = {[0:126]};
+        }
+        //Mantisa de A
+        coverpoint bfm.Float_num_A [22:0]{
+            bins mantisa_0 = {23'b00000000000000000000000};
+            bins mantisa_no_0 = {[1:$]};
+        }
+        //Valor de B como cero
         coverpoint bfm.Float_num_B{
             bins num_0 = {32'b00000000000000000000000000000000};
-            bins num_positivo = {32'b0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX};
-            bins num_negativo = {32'b1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX};
+        }
+        //Signo de B
+        coverpoint bfm.Float_num_B [31]{
+            bins num_positivo = {1'b0};
+            bins num_negativo = {1'b1};
+        }
+        //Exponente de B
+        coverpoint bfm.Float_num_B [30:23]{
+            bins mayor_a_127 = {[127:255]};
+            bins menor_a_127 = {[0:126]};
+        }
+        //Mantisa de B
+        coverpoint bfm.Float_num_B [22:0]{
+            bins mantisa_0 = {23'b00000000000000000000000};
+            bins mantisa_no_0 = {[1:$]};
         }
     endgroup
 
