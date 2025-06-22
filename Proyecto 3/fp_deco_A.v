@@ -18,6 +18,7 @@ module fp_decoA (
 // Se divide el número de 32 bits en tres partes para ejecutar las operaciones
 assign Signo_A = Float_num_A[31];
 assign Exponente_A = Float_num_A[30:23];
-assign Mantissa_A = { 1'b1, Float_num_A[22:0]}; // Se agrega un 1 al inicio para la normalización implícita (1.xxx)
+// Se agrega un 1 al inicio para la normalización implícita (1.xxx), si es 0 no se agrega
+assign Mantissa_A = (Exponente_A == 8'b0) ? {1'b0, Float_num_A[22:0]} : {1'b1, Float_num_A[22:0]};
 
 endmodule 
