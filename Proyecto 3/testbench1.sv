@@ -64,8 +64,8 @@ module testbench1;
 
         //Hacer una suma de números negativos
         OP_input = 1'b0; //Suma
-        Float_num_A = 32'b11000000110101100000000000000000; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: 6.6875 
-        Float_num_B = 32'b11000000011101110000000000000000; //Bit de signo en 1, Exponente: 10000000 (128 en decimal), Número en decimal: 3.859375
+        Float_num_A = 32'b11000000110101100000000000000000; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: -6.6875 
+        Float_num_B = 32'b11000000011101110000000000000000; //Bit de signo en 1, Exponente: 10000000 (128 en decimal), Número en decimal: -3.859375
         #200;
 
         /*
@@ -78,7 +78,7 @@ module testbench1;
         //Hacer una resta
         OP_input = 1'b0; //Suma
         Float_num_A = 32'b01000000110101100000000000000000; //Bit de signo en 0, Exponente: 10000001 (129 en decimal), Número en decimal: 6.6875
-        Float_num_B = 32'b11000000011101110000000000000000; //Bit de signo en 1, Exponente: 10000000 (128 en decimal), Número en decimal: 3.859375
+        Float_num_B = 32'b11000000011101110000000000000000; //Bit de signo en 1, Exponente: 10000000 (128 en decimal), Número en decimal: -3.859375
         #200;
 
         /*
@@ -103,8 +103,8 @@ module testbench1;
 
         //Hacer una multiplicación de números negativos
         OP_input = 1'b1; //Multiplicación
-        Float_num_A = 32'b11000000101011100110011001100110; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: 5.45
-        Float_num_B = 32'b11000000111011111010010111100011; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: 7.489
+        Float_num_A = 32'b11000000101011100110011001100110; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: -5.45
+        Float_num_B = 32'b11000000111011111010010111100011; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: -7.489
         #200;
 
         /*
@@ -117,7 +117,7 @@ module testbench1;
         //Hacer una multiplicación de números con distintos signo
         OP_input = 1'b1; //Multiplicación
         Float_num_A = 32'b01000000101011100110011001100110; //Bit de signo en 0, Exponente: 10000001 (129 en decimal), Número en decimal: 5.45
-        Float_num_B = 32'b11000000111011111010010111100011; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: 7.489
+        Float_num_B = 32'b11000000111011111010010111100011; //Bit de signo en 1, Exponente: 10000001 (129 en decimal), Número en decimal: -7.489
         #200;
 
         /*
