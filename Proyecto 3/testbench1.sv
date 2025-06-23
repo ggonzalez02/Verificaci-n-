@@ -46,7 +46,7 @@ module testbench1;
         Resultado ideal (0)
         0 00000000 00000000000000000000000
         Resultado simulacion
-        0 11111111 00000000000000000000000
+        0 00000000 00000000000000000000000
         */
 
         //Hacer una suma de números positivos
@@ -59,7 +59,7 @@ module testbench1;
         Resultado ideal (10.546875)
         0 10000010 01010001100000000000000
         Resultado simulacion
-        0 10000000 01010001100000000000000
+        0 10000010 01010001100000000000000
         */
 
         //Hacer una suma de números negativos
@@ -72,7 +72,7 @@ module testbench1;
         Resultado ideal (-10.546875)
         1 10000010 01010001100000000000000
         Resultado simulacion
-        1 10000000 01010001100000000000000
+        1 10000010 01010001100000000000000
         */
 
         //Hacer una resta
@@ -85,7 +85,7 @@ module testbench1;
         Resultado ideal (2.828125)
         0 10000000 01101010000000000000000
         Resultado simulacion
-        0 01111110 01101010000000000000000
+        0 10000000 01101010000000000000000
         */
 
         //Hacer una multiplicación de números positivos
@@ -111,7 +111,7 @@ module testbench1;
         Resultado ideal (40.81505)
         0 10000100 01000110100001010011100
         Resultado simulacion
-        v
+        0 10000100 01000110100001010011100
         */
 
         //Hacer una multiplicación de números con distintos signo

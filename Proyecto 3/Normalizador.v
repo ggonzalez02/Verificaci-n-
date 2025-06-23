@@ -50,6 +50,7 @@ always @(*) begin
         if (Producto == 0) begin
             exponente_final = 8'b0;
             mantissa_final = 23'b0;
+            signo_final = 1'b0;
         end
         else begin
             exp_temp = $signed({1'b0, Exp_resul});
@@ -121,6 +122,7 @@ always @(*) begin
         if (Suma_resul == 0) begin
             exponente_final = 8'b0;
             mantissa_final = 23'b0;
+            signo_final = 1'b0;
         end
         else begin
             exp_temp = $signed({2'b00, Exp_comun}); 

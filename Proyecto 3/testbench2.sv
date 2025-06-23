@@ -16,10 +16,12 @@ module testbench2;
     interfaz bfm();
 
     //Señales para hacer pruebas
-    bit op_actual;
-    shortreal float_num_A_actual;
-    shortreal float_num_B_actual;
-    shortreal calculo;
+    logic op_actual;
+    logic [31:0] float_num_A_actual;
+    logic [31:0] float_num_B_actual;
+    logic [31:0] calculo;
+    int indice;
+    logic [31:0] resultado_esperado;
 
     //Instancia del DUT
     top DUT(
@@ -32,24 +34,24 @@ module testbench2;
     //Archivo tipo log
     integer log_file;
 
+    //Waveform para pruebas en playground
     initial begin
-        // Para el wave form en playground
         $dumpfile("dump.vcd");
         $dumpvars(0, testbench2);
     end
 
+    //Memoria que contiene valores aleatorios de prueba
+    logic [31:0] mem [0:999];
+    //Cargar datos en la memoria
+    initial begin
+        $readmemb("ieee754_reales.mem", mem);
+    end
+
     //Obtener operacion aleatoria (suma o multiplicación)
-    function bit operacion_aleatoria();
-        bit op_aleatoria;
+    function logic operacion_aleatoria();
+        logic op_aleatoria;
         op_aleatoria = $urandom;
         return op_aleatoria;
-    endfunction
-
-    //Obtener número aleatorio flotante
-    function shortreal numero_flotante_aleatorio();
-        shortreal num_flotante;
-        num_flotante = $urandom_range(-2896,2896);
-        return num_flotante;
     endfunction
 
     //Scoreboard
@@ -58,24 +60,23 @@ module testbench2;
         bit operacion_esperada;
         shortreal A, B;
         shortreal resultado_esperado;
-
+        
         //Guardar el resultado esperado
-        function void guardar(input operacion, input [31:0] float_num_A, input [31:0] float_num_B);
+        function logic [31:0] guardar(logic operacion, logic [31:0] float_num_A, logic [31:0] float_num_B);
             operacion_esperada = operacion;
-            A = $bitstoreal(float_num_A);
-            B = $bitstoreal(float_num_B);
+            A = shortreal'(float_num_A);
+            B = shortreal'(float_num_B);
             if (operacion_esperada == 0) begin
                 resultado_esperado = A + B;
-                resultado_esperado = $realtobits(resultado_esperado);
             end
             else begin
                 resultado_esperado = A * B;
-                resultado_esperado = $realtobits(resultado_esperado);
             end
+            return $bitstoreal(resultado_esperado);
         endfunction
 
         //Verificar lectura de la operacion y el resultado
-        function void revisar(input op, input [31:0] resultado);
+        function void revisar(logic op, logic [31:0] resultado, logic [31:0] resultado_esperado);
         //Verificar la operacion
         if (op == 0) begin
             if (operacion_esperada != op)
@@ -83,12 +84,11 @@ module testbench2;
         else begin
             if (operacion_esperada != op)
                 $error("FALLO: Multiplicación, Esperado: %0b, Obtenido: %0b", operacion_esperada, op);
-        end
+            end
         end
         //Verificar el resultado
         if (resultado_esperado != resultado)
             $error("FALLO: Resultado esperado: %0b, Resultado obtenido: %0b", resultado_esperado, resultado);
-
         endfunction
     endclass //Scoreboard
 
@@ -101,13 +101,11 @@ module testbench2;
             bfm = p_bfm;
         endfunction
 
-        task entradas(input op, input [31:0] float_num_A, input [31:0] float_num_B);
+        task entradas(logic op, logic [31:0] float_num_A, logic [31:0] float_num_B);
             bfm.OP_input = op;
             bfm.Float_num_A = float_num_A;
             bfm.Float_num_B = float_num_B;
         endtask
-
-
     endclass //Tester
 
     //Pruebas
@@ -118,22 +116,24 @@ module testbench2;
 
         scoreboard = new();
         tester = new(bfm);
-        
+
         // Abrir archivo tipo log
         log_file = $fopen("Testbench1.log", "w");
         $fdisplay(log_file, "Time | Float_num_A | Float_num_B | OP_input | Resultado");
 
         for (int i = 0; i < 10; i++) begin
             op_actual = operacion_aleatoria();
-            float_num_A_actual = numero_flotante_aleatorio();
-            float_num_A_actual = $realtobits(float_num_A_actual);
-            float_num_B_actual = numero_flotante_aleatorio();
-            float_num_B_actual = $realtobits(float_num_B_actual);
+            //Obtener un número aleatorio para A
+            indice = $urandom_range(0,999);
+            float_num_A_actual = mem[indice];
+            //Obtener un número aleatorio para B
+            indice = $urandom_range(0,999);
+            float_num_B_actual = mem[indice];
             tester.entradas(op_actual, float_num_A_actual, float_num_B_actual);
-            scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
+            resultado_esperado = scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
+            #5;
             calculo = bfm.Resultado;
-            #50;
-            scoreboard.revisar(op_actual, calculo);
+            scoreboard.revisar(op_actual, calculo, resultado_esperado);
             #50;
         end
 
@@ -193,7 +193,7 @@ module testbench2;
     Sumar -> Multiplicar
     Multiplicar -> Sumar
     */
-    
+
     covergroup op_cover;
         //Sumas, multiplicaciones y transiciones entre ellas
         coverpoint bfm.OP_input{
@@ -247,8 +247,8 @@ module testbench2;
     initial begin
         op_c = new();
         forever begin
+            #1;
             op_c.sample();
-            #50;
         end
     end
 
