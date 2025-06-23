@@ -60,19 +60,19 @@ module testbench2;
         bit operacion_esperada;
         shortreal A, B;
         shortreal resultado_esperado;
-        
+
         //Guardar el resultado esperado
         function logic [31:0] guardar(logic operacion, logic [31:0] float_num_A, logic [31:0] float_num_B);
             operacion_esperada = operacion;
-            A = shortreal'(float_num_A);
-            B = shortreal'(float_num_B);
+            A = $bitstoshortreal(float_num_A);
+            B = $bitstoshortreal(float_num_B);
             if (operacion_esperada == 0) begin
                 resultado_esperado = A + B;
             end
             else begin
                 resultado_esperado = A * B;
             end
-            return $bitstoreal(resultado_esperado);
+            return $shortrealtobits(resultado_esperado);
         endfunction
 
         //Verificar lectura de la operacion y el resultado
@@ -122,19 +122,35 @@ module testbench2;
         $fdisplay(log_file, "Time | Float_num_A | Float_num_B | OP_input | Resultado");
 
         for (int i = 0; i < 10; i++) begin
-            op_actual = operacion_aleatoria();
-            //Obtener un número aleatorio para A
-            indice = $urandom_range(0,999);
-            float_num_A_actual = mem[indice];
-            //Obtener un número aleatorio para B
-            indice = $urandom_range(0,999);
-            float_num_B_actual = mem[indice];
-            tester.entradas(op_actual, float_num_A_actual, float_num_B_actual);
-            resultado_esperado = scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
-            #5;
-            calculo = bfm.Resultado;
-            scoreboard.revisar(op_actual, calculo, resultado_esperado);
-            #50;
+            if (i == 0) begin
+                op_actual = operacion_aleatoria();
+                //Asignar 0 a A
+                float_num_A_actual = 0;
+                //Asignar 0 a B
+                float_num_B_actual = 0;
+                tester.entradas(op_actual, float_num_A_actual, float_num_B_actual);
+                resultado_esperado = scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
+                #5;
+                calculo = bfm.Resultado;
+                scoreboard.revisar(op_actual, calculo, resultado_esperado);
+                #50;
+            end
+            else begin
+                op_actual = operacion_aleatoria();
+                //Obtener un número aleatorio para A
+                indice = $urandom_range(0,999);
+                float_num_A_actual = mem[indice];
+                //Obtener un número aleatorio para B
+                indice = $urandom_range(0,999);
+                float_num_B_actual = mem[indice];
+                tester.entradas(op_actual, float_num_A_actual, float_num_B_actual);
+                resultado_esperado = scoreboard.guardar(op_actual, float_num_A_actual, float_num_B_actual);
+                #5;
+                calculo = bfm.Resultado;
+                scoreboard.revisar(op_actual, calculo, resultado_esperado);
+                #50;
+            end
+            
         end
 
         //Resultados de los covergroups
